@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Slide Puzzle</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        select,
+        button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #444;
+        }
+
+        /* 4x4 Grid Container. 4 columns of 100px each */
+        #puzzle-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-template-rows: repeat(4, 100px);
+            gap: 2px;
+            background-color: #111;
+            border: 4px solid #333;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Puzzle Pieces */
+        .piece {
+            width: 100px;
+            height: 100px;
+            background-size: 100px 100px;
+            /* Scale piece to fit our 100x100 grid cells */
+            background-repeat: no-repeat;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-sizing: border-box;
+        }
+
+        .piece:active {
+            transform: scale(0.97);
+        }
+
+        /* Style for the blank/empty slot */
+        .piece.empty {
+            background-image: none !important;
+            background-color: #1a1a1a;
+            cursor: default;
+        }
+
+        #win-message {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #4caf50;
+            font-weight: bold;
+            height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Earth Puzzle</h1>
+
+    <div class="controls">
+        <label for="level-select">Choose Level:</label>
+        <select id="level-select">
+            <option value="0">Level 0</option>
+            <option value="1">Level 1</option>
+            <option value="2">Level 2</option>
+            <option value="3">Level 3</option>
+            <option value="4">Level 4</option>
+            <option value="5">Level 5</option>
+            <option value="6">Level 6</option>
+            <option value="7">Level 7</option>
+            <option value="8">Level 8</option>
+            <option value="9">Level 9</option>
+        </select>
+        <button id="start-btn">Scramble & Play</button>
+    </div>
+
+    <div id="puzzle-board"></div>
+    <div id="win-message"></div>
+
+    <script>
+        const board = document.getElementById('puzzle-board');
+        const levelSelect = document.getElementById('level-select');
+        const startBtn = document.getElementById('start-btn');
+        const winMessage = document.getElementById('win-message');
+
+        let currentLevel = "0";
+        let gridLayout = [];
+        const EMPTY_PIECE_ID = 15;
+
+        // Initialize/Reset the Board
+        function initGame() {
+            winMessage.innerText = "";
+            currentLevel = levelSelect.value;
+
+            // Generate standard linear order [0, 1, 2... 15]
+            gridLayout = Array.from({ length: 16 }, (_, i) => i);
+
+            scrambleBoard();
+            renderBoard();
+        }
+
+        // Solvable puzzle scrambler
+        function scrambleBoard() {
+            let emptyPos = 15;
+
+            for (let i = 0; i < 200; i++) {
+                const validMoves = getValidMoves(emptyPos);
+                const randomMove = validMoves[mathRandomInt(0, validMoves.length - 1)];
+
+                // Swap empty position with the random adjacent piece
+                [gridLayout[emptyPos], gridLayout[randomMove]] = [gridLayout[randomMove], gridLayout[emptyPos]];
+                emptyPos = randomMove;
+            }
+        }
+
+        // Fixed Capital M for Math
+        function mathRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Finds which grid indices can move into the current empty index slot
+        function getValidMoves(emptyIndex) {
+            const moves = [];
+            const row = Math.floor(emptyIndex / 4);
+            const col = emptyIndex % 4;
+
+            if (row > 0) moves.push(emptyIndex - 4);
+            if (row < 3) moves.push(emptyIndex + 4);
+            if (col > 0) moves.push(emptyIndex - 1);
+            if (col < 3) moves.push(emptyIndex + 1);
+
+            return moves;
+        }
+
+        // Fixed to document.createElement
+        function renderBoard() {
+            board.innerHTML = "";
+
+            gridLayout.forEach((pieceId, currentGridIndex) => {
+                const cell = document.createElement('div');
+                cell.className = 'piece';
+
+                if (pieceId === EMPTY_PIECE_ID) {
+                    cell.classList.add('empty');
+                } else {
+                    cell.style.backgroundImage = `url('puzzle_game/level_${currentLevel}/piece_${pieceId}.jpg')`;
+                }
+
+                cell.addEventListener('click', () => handlePieceClick(currentGridIndex));
+                board.appendChild(cell);
+            });
+        }
+
+        function handlePieceClick(clickedIndex) {
+            const emptyIndex = gridLayout.indexOf(EMPTY_PIECE_ID);
+            const validMoves = getValidMoves(emptyIndex);
+
+            if (validMoves.includes(clickedIndex)) {
+                [gridLayout[emptyIndex], gridLayout[clickedIndex]] = [gridLayout[clickedIndex], gridLayout[emptyIndex]];
+                renderBoard();
+                checkWinCondition();
+            }
+        }
+
+        function checkWinCondition() {
+            const isWin = gridLayout.every((val, i) => val === i);
+            if (isWin) {
+                winMessage.innerText = "🎉 Puzzle Solved! Spectacular View!";
+                const emptyCell = document.querySelector('.piece.empty');
+                if (emptyCell) {
+                    emptyCell.style.backgroundImage = `url('puzzle_game/level_${currentLevel}/piece_${EMPTY_PIECE_ID}.jpg')`;
+                    emptyCell.classList.remove('empty');
+                }
+            }
+        }
+
+        startBtn.addEventListener('click', initGame);
+        levelSelect.addEventListener('change', initGame);
+
+        window.onload = initGame;
+    </script>
+</body>
+
+</html>
