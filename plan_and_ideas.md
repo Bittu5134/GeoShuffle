@@ -26,7 +26,6 @@ https://cdn.jsdelivr.net/gh/limhenry/earthview@master/earthview.json
 
 jsdeliver link
 
-
 join macondo
 
 
@@ -41,3 +40,4 @@ I have a few questions regarding macondo
 - If i have multiple projects then do i nedd to work on each of them daily to maintain the streak? how long do i need to work on individual projects?
 - is time spent making assets and soudtrack for my game counted or not?
 - Will fruits be given only after shipping?
+
