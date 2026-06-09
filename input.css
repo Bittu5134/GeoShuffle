@@ -2,67 +2,25 @@
 @plugin "daisyui";
 
 @theme {
-  /* Light mode values (Default) */
   --color-main-bg: #eae7d6;
   --color-secondary-bg: #c0c5b5;
-  /* --color-secondary-bg: #cbc49a; */
   --color-main-text: #173a31;
-
-  /* Dark mode values (Using elegant, matching deep earth tones) */
-  --color-main-bg-dark: #11221d;
-  --color-main-text-dark: #f0ede0;
 }
 
 body {
-  font-family:
-    "Fredoka",
-    "Roboto",
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    "Open Sans",
-    "Helvetica Neue",
-    sans-serif;
+  font-family: "Fredoka", system-ui, sans-serif;
 }
 
-body main h1 {
-  font-variant: small-caps;
-}
-
-
-/* Top-Left Corner (1st element) */
-#tile0 {
-  border-top-left-radius: 0.25rem; /* Equivalent to rounded-tl-xl */
-}
-
-/* Top-Right Corner (6th element) */
-#tile5 {
-  border-top-right-radius: 0.25rem; /* Equivalent to rounded-tr-xl */
-}
-
-/* Bottom-Left Corner (19th element) */
-#tile18 {
-  border-bottom-left-radius: 0.25rem; /* Equivalent to rounded-bl-xl */
-}
-
-/* Bottom-Right Corner (24th element) */
-#tile23 {
-  border-bottom-right-radius: 0.25rem; /* Equivalent to rounded-br-xl */
-}
-
+/* Map slice configurations */
 #board > div {
-
-  /* background-image: url("https://www.gstatic.com/prettyearth/assets/full/7021.jpg"); */
   background-image: url("./map.jpg");
   background-size: 600% 400%;
   background-repeat: no-repeat;
 }
 
-#tile23 {
-  opacity: 0;
-}
+/* --- THE POSITIONAL CORNER GUARD SYSTEM --- */
+/* Elements dynamically inherit corner rounding based on their visual slot placement, not their value */
+#board > div:nth-child(1)  { border-top-left-radius: 0.5rem; }
+#board > div:nth-child(6)  { border-top-right-radius: 0.5rem; }
+#board > div:nth-child(19) { border-bottom-left-radius: 0.5rem; }
+#board > div:nth-child(24) { border-bottom-right-radius: 0.5rem; }
