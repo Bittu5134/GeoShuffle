@@ -1,4 +1,6 @@
 const board = document.getElementById("board");
+const boardStyle = window.getComputedStyle(board);
+
 const tiles = [];
 
 function indexToPos(index) {
@@ -41,6 +43,18 @@ function handleTileClick(event) {
   }
 
   console.log(`Tile ${tileText} clicked at board index: ${currentPosition}`);
+
+  let clientHeight =
+    board.clientHeight - parseFloat(boardStyle.paddingTop) - parseFloat(boardStyle.paddingBottom);
+  let clientWidth =
+    board.clientWidth - parseFloat(boardStyle.paddingRight) - parseFloat(boardStyle.paddingLeft);
+
+  let randomSign = Math.random() < 0.5 ? -1 : 1;
+  clientHeight *= randomSign;
+  randomSign = Math.random() < 0.5 ? -1 : 1;
+  clientHeight *= randomSign;
+
+  tile.style.transform += `translate(${clientWidth/6}px, ${clientHeight/4}px)`;
 
 
 }
