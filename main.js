@@ -17,7 +17,6 @@ function renderBoard() {
   tiles.forEach((value, index) => {
     const tile = document.createElement("div");
 
-    // Core Tailwind structure classes matching your layout requirements
     tile.className =
       "aspect-square flex items-center justify-center outline-1 text-amber-50 bg-neutral-500 cursor-pointer select-none transition-all duration-200";
 
@@ -26,14 +25,16 @@ function renderBoard() {
     } else {
       tile.textContent = value;
 
-      // Calculate background slicing math dynamically based on the tile's permanent value identity
+      // Assign a unique view-transition-name matching the tile's permanent number value.
+      // This maps its old screen position directly to its new screen position.
+      tile.style.viewTransitionName = `tile-${value}`;
+
       const [origCol, origRow] = indexToPos(value - 1);
-      const colPercent = origCol * 20; // 100% / (6 columns - 1) = 20% steps
-      const rowPercent = origRow * 33.3333; // 100% / (4 rows - 1) = 33.3333% steps
+      const colPercent = origCol * 20;
+      const rowPercent = origRow * 33.3333;
       tile.style.backgroundPosition = `${colPercent}% ${rowPercent}%`;
     }
 
-    // Capture user clicks to calculate step translation moves
     tile.addEventListener("click", () => moveTile(index));
     board.appendChild(tile);
   });
@@ -45,8 +46,6 @@ function moveTile(index) {
   const [tileCol, tileRow] = indexToPos(index);
   const [emptyCol, emptyRow] = indexToPos(emptyIndex);
 
-  // Math check: A move is valid if the clicked tile is exactly 1 step away
-  // from the ghost slot horizontally or vertically (Manhattan Distance)
   const isAdjacent = Math.abs(tileCol - emptyCol) + Math.abs(tileRow - emptyRow) === 1;
 
   if (isAdjacent) {
@@ -54,8 +53,16 @@ function moveTile(index) {
     tiles[emptyIndex] = tiles[index];
     tiles[index] = "";
 
-    // Instantly refresh DOM node map tracking positions cleanly
-    renderBoard();
+    // Check if browser supports the View Transitions API
+    if (document.startViewTransition) {
+      // Morph the structural board change smoothly
+      document.startViewTransition(() => {
+        renderBoard();
+      });
+    } else {
+      // Fallback for older browsers
+      renderBoard();
+    }
   }
 }
 

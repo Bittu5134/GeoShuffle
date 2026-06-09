@@ -24,3 +24,16 @@ body {
 #board > div:nth-child(6)  { border-top-right-radius: 0.5rem; }
 #board > div:nth-child(19) { border-bottom-left-radius: 0.5rem; }
 #board > div:nth-child(24) { border-bottom-right-radius: 0.5rem; }
+
+/* Speeds up and sharpens the sliding motion */
+::view-transition-group(*) {
+  animation-duration: 0.2s;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Stops old and new instances from cross-fading over each other */
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation: none;
+  mix-blend-mode: normal;
+}
