@@ -11,29 +11,16 @@ body {
   font-family: "Fredoka", system-ui, sans-serif;
 }
 
-/* Map slice configurations */
-#board > div {
-  background-image: url("./map.jpg");
-  background-size: 600% 400%;
-  background-repeat: no-repeat;
+#board {
+    position: relative;
 }
 
-/* --- THE POSITIONAL CORNER GUARD SYSTEM --- */
-/* Elements dynamically inherit corner rounding based on their visual slot placement, not their value */
-#board > div:nth-child(1)  { border-top-left-radius: 0.5rem; }
-#board > div:nth-child(6)  { border-top-right-radius: 0.5rem; }
-#board > div:nth-child(19) { border-bottom-left-radius: 0.5rem; }
-#board > div:nth-child(24) { border-bottom-right-radius: 0.5rem; }
-
-/* Speeds up and sharpens the sliding motion */
-::view-transition-group(*) {
-  animation-duration: 0.2s;
-  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+.tile {
+  position: absolute;
+  cursor: pointer;
+  user-select: none;
 }
 
-/* Stops old and new instances from cross-fading over each other */
-::view-transition-old(*),
-::view-transition-new(*) {
-  animation: none;
-  mix-blend-mode: normal;
+.tile:hover {
+    box-shadow: 0 0 0 2px rgba(255,255,255,.5);
 }
