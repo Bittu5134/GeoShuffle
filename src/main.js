@@ -9,7 +9,6 @@ const ROWS = 4;
 
 let tiles = [...Array(24).keys()].map((i) => i + 1);
 
-
 function indexToPos(index) {
   return [index % COLS, Math.floor(index / COLS)];
 }
@@ -19,7 +18,7 @@ function posToIndex(col, row) {
 
 function renderBoard() {
   board.innerHTML = "";
-  
+
   tiles.forEach((value, index) => {
     const tile = document.createElement("div");
     tile.className =
@@ -38,27 +37,33 @@ function renderBoard() {
 }
 
 function moveTile(index) {
-
-  const state = Flip.getState("#board > div");
-
   const emptyIndex = tiles.indexOf(24);
   const [tileCol, tileRow] = indexToPos(index);
   const [emptyCol, emptyRow] = indexToPos(emptyIndex);
 
-  
-  // check if the tile is adjacent (excluding diagonally)
-  if (Math.abs(tileCol - emptyCol) + Math.abs(tileRow - emptyRow) === 1) {
-    
-    tiles[emptyIndex] = tiles[index];
-    tiles[index] = 24;
-    renderBoard();
-    
-    Flip.from(state, {
-      duration: 0.4,
-      ease: "power2.out",
-      targets: "#board > div:not(.opacity-0)",
-    });
+  const sameCol = tileCol === emptyCol;
+  const sameRow = tileRow === emptyRow;
+
+  let listTileSliced, listTmpTiles;
+  if (sameCol === sameRow) return;
+
+  const state = Flip.getState("#board > div");
+  if (sameCol) {
+    listTmpTiles = [tileCol, tileCol + COLS, tileCol + COLS * 2, tileCol + COLS * 3];
+    if (tileRow < emptyRow) listTileSliced = listTmpTiles.slice(tileRow, emptyRow + 1).reverse();
+    else listTileSliced = listTmpTiles.slice(emptyRow, tileRow + 1);
+  } else if (sameRow) {
+    listTmpTiles = [...Array(COLS).keys()].map((i) => Math.floor(index / COLS) * COLS + i);
+    if (tileCol < emptyCol) listTileSliced = listTmpTiles.slice(tileCol, emptyCol + 1).reverse();
+    else listTileSliced = listTmpTiles.slice(emptyCol, tileCol + 1);
   }
-} 
+  listTileSliced.forEach((tileValue, tileIndex) => {
+    let tileNewVal = tiles[listTileSliced[tileIndex + 1]];
+    if (!tileNewVal) tileNewVal = 24;
+    tiles[tileValue] = tileNewVal;
+  });
+  renderBoard();
+  Flip.from(state, { duration: 0.4, ease: "power2.out", targets: "#board > div:not(.opacity-0)" });
+}
 
 renderBoard();
