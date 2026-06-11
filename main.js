@@ -156,7 +156,7 @@ function isSolved() {
   return true;
 }
 
-async function animateShuffle(steps = 3) {
+async function animateShuffle(steps = 150) {
   isShuffling = true;
 
   for (let i = 0; i < steps; i++) {
@@ -178,7 +178,7 @@ async function animateShuffle(steps = 3) {
 
     render(true);
 
-    await sleep(50);
+    await sleep(20);
   }
 
   moves = 0;
