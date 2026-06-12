@@ -31,6 +31,8 @@ join macondo
 
 
 
+
+
 I have a few questions regarding macondo
 
 - Can I add a game as a project that i started working on as a game jam project?
@@ -41,6 +43,8 @@ I have a few questions regarding macondo
 - is time spent making assets and soudtrack for my game counted or not?
 - Will fruits be given only after shipping?
 
+
+---
 
 
 Devlog #3: Major Progress with actual game Mechanics
@@ -74,3 +78,46 @@ Also no sliding animation yet
 
 also its weird how there is no direct way to get a div's raw computed height without padding and margins
 
+---
+
+Devlog #5: implemented multi-tile-slide and switched to GASP for animations
+
+Today I probably spent the longest on this project. at this rate idk how slow my progress will be, I keep going back to reworking the same thing multiple times over until it works and looks perfect, I'll have to learn to skip things on occassion
+
+Ok now back to topic, Firstly I am now using GASP for animating the Sliding animation, and I'll state my reasoning for it
+
+first I tried 5 different approaches to animating tile sliding
+
+Pure JS
+- Pros: Very simple
+- Cons: No sliding animation....
+
+Using Css
+- Pros: no need for any other tools
+- Cons: HELL!!!!!!!!
+
+Native View Transition API
+- Pros: Simple enough and built into browser
+- Cons: Cant interact with tiles during animation which broke immersion
+
+Anime.JS
+- Pros: Very Powerful and feature rich
+- Cons: Overkill for my use case
+
+GASP (in use rn)
+- Pros: Simple FLIP extension
+- Cons: Idk? not as verbose as animejs? its simple for my use case, I didnt try other features
+
+
+back to my js logic, it has two main function, `render()` and `moveTile()` and today I spent my entire time working on the second function.
+Its a 30 line function that I might have rewritter over a few donzen times, after each itiratin I made it smaller and reduced the numbers of loops and checks
+
+<!-- Image -->
+
+Currently I use a simple logic which first checks if the clicked tile is in the same row/column as the empty tile. Then it creates a list of all tiles between the empty and clicked tile, and moves all tiles together.
+
+<!-- Image -->
+
+tomorrow I'll work on  improving the Render Function, Currently all 24 tiles are destroyed and recreated on each click, thats got to kill performance? right?
+
+---

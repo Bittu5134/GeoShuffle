@@ -7,7 +7,7 @@ const board = document.getElementById("board");
 const COLS = 6;
 const ROWS = 4;
 
-let boardState = [...Array(24).keys()].map((i) => i + 1);
+let tiles = [...Array(24).keys()].map((i) => i + 1);
 
 function indexToPos(index) {
   return [index % COLS, Math.floor(index / COLS)];
@@ -16,11 +16,12 @@ function posToIndex(col, row) {
   // unused but keeping for asthetic purposes
   return row * COLS + col;
 }
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function renderBoard() {
   board.innerHTML = "";
 
-  boardState.forEach((value, index) => {
+  tiles.forEach((value, index) => {
     const tile = document.createElement("div");
     tile.className =
       "aspect-square flex items-center justify-center outline-1 text-amber-50/0 bg-neutral-500 cursor-pointer select-none";
@@ -38,7 +39,7 @@ function renderBoard() {
 }
 
 function moveTile(index) {
-  const emptyIndex = boardState.indexOf(24);
+  const emptyIndex = tiles.indexOf(24);
   const [tileCol, tileRow] = indexToPos(index);
   const [emptyCol, emptyRow] = indexToPos(emptyIndex);
 
@@ -61,11 +62,11 @@ function moveTile(index) {
   let curr = emptyIndex;
   while (curr !== index) {
     const next = curr - step;
-    boardState[curr] = boardState[next];
+    tiles[curr] = tiles[next];
     curr = next;
   }
 
-  boardState[index] = 24;
+  tiles[index] = 24;
   renderBoard();
   Flip.from(state, {
     duration: 0.35,
@@ -75,4 +76,41 @@ function moveTile(index) {
   });
 }
 
+function shuffleBoard(count = 200) {
+  const state = Flip.getState("#board > div");
+  for (let shuffleMove = 0; shuffleMove <= count; shuffleMove++) {
+    console.log("shuffle triggered");
+    let emptyIndex = tiles.indexOf(24);
+    let options = [1, -1, COLS, -COLS];
+    let step = options[Math.floor(Math.random() * options.length)];
+    let swapIndex = emptyIndex + step;
+    let swapPos = indexToPos(swapIndex);
+    let emptyPos = indexToPos(emptyIndex);
+
+    if (swapIndex >= tiles.length || swapIndex < 0) {
+      continue;
+    }
+
+    if (Math.abs(step) === 1 && swapPos[1] !== emptyPos[1]) {
+      continue;
+    }
+
+    [tiles[emptyIndex], tiles[swapIndex]] = [tiles[swapIndex], tiles[emptyIndex]];
+
+    console.log(swapPos[1] * COLS);
+    console.log(swapPos[1] * COLS + COLS);
+    console.log(emptyIndex, swapIndex, step);
+  }
+  renderBoard();
+  Flip.from(state, {
+    duration: 2,
+    ease: "power3.out",
+    targets: "#board > div:not(.opacity-0)",
+    overwrite: "auto",
+  });
+}
+
 renderBoard();
+// shuffleBoard();
+
+document.getElementById("new-game").addEventListener("click", () => shuffleBoard(500));

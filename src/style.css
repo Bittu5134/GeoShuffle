@@ -11,6 +11,10 @@ body {
   font-family: "Fredoka", system-ui, sans-serif;
 }
 
+h1 {
+  font-variant: small-caps;
+}
+
 /* Map slice configurations */
 #board > div {
   background-image: url("./map.jpg");
