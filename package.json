@@ -1,12 +1,1 @@
-{
-  "scripts": {
-    "dev": "tailwindcss -i ./input.css -o ./style.css --watch"
-  },
-  "dependencies": {
-    "@tailwindcss/cli": "^4.3.0",
-    "tailwindcss": "^4.3.0"
-  },
-  "devDependencies": {
-    "daisyui": "^5.5.23"
-  }
-}
+{"scripts":{"dev":"vite","build":"vite build","preview":"vite preview"},"dependencies":{"@tailwindcss/cli":"^4.3.0","@tailwindcss/vite":"^4.3.0","gsap":"^3.15.0","tailwindcss":"^4.3.0"},"devDependencies":{"daisyui":"^5.5.23","vite":"^8.0.16"},"name":"geoshuffle","description":"Work in progress GeoSHuffle Game project","version":"1.0.0","main":"main.js","keywords":[],"author":"","license":"ISC"}
