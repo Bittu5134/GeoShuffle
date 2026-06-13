@@ -17,10 +17,8 @@ h1 {
 
 /* Map slice configurations */
 #board > div {
-  background-image: url("./map.jpg");
   background-size: 600% 400%;
   background-repeat: no-repeat;
-  /* Removed all animation and transition rules entirely for instant snap execution */
 }
 
 /* --- THE POSITIONAL CORNER GUARD SYSTEM --- */

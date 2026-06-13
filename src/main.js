@@ -1,5 +1,6 @@
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
+import earthData from "./earth.json";
 
 gsap.registerPlugin(Flip);
 
@@ -8,6 +9,13 @@ const COLS = 6;
 const ROWS = 4;
 
 let tiles = [...Array(24).keys()].map((i) => i + 1);
+const tilesEnd = [...tiles];
+let currentMap = {
+  country: "China",
+  image: "./map.jpg",
+  map: "https://www.google.com/maps/@29.14274,90.513512,15z/data=!3m1!1e3",
+  region: "Shannan",
+};
 
 function indexToPos(index) {
   return [index % COLS, Math.floor(index / COLS)];
@@ -24,13 +32,14 @@ function renderBoard() {
   tiles.forEach((value, index) => {
     const tile = document.createElement("div");
     tile.className =
-      "aspect-square flex items-center justify-center outline-1 text-amber-50/100 bg-neutral-500 cursor-pointer select-none";
+      "aspect-square flex items-center justify-center outline-1 text-amber-50/75 bg-auto cursor-pointer select-none";
     if (value === 24) {
       tile.classList.add("opacity-0", "pointer-events-none");
     } else {
       const [origCol, origRow] = indexToPos(value - 1);
       tile.textContent = `${value}`;
       // tile.textContent = `${value} - ${origRow}:${origCol}`;
+      tile.style.backgroundImage = `url('${currentMap["image"]}')`;
       tile.dataset.flipId = `tile-${value}`;
       tile.style.backgroundPosition = `${origCol * 20}% ${origRow * 33.3333}%`;
     }
@@ -78,7 +87,10 @@ function moveTile(index) {
 }
 
 function shuffleBoard(count = 200) {
+  tiles = [...tilesEnd];
+  renderBoard()
   const state = Flip.getState("#board > div");
+  currentMap = earthData[Math.floor(Math.random() * earthData.length)];
   for (let shuffleMove = 0; shuffleMove <= count; shuffleMove++) {
     console.log("shuffle triggered");
     let emptyIndex = tiles.indexOf(24);
@@ -89,13 +101,13 @@ function shuffleBoard(count = 200) {
     let emptyPos = indexToPos(emptyIndex);
 
     if (swapIndex >= tiles.length || swapIndex < 0) {
-      shuffleMove--
+      shuffleMove--;
       continue;
     }
 
     if (Math.abs(step) === 1 && swapPos[1] !== emptyPos[1]) {
       shuffleMove--;
-      continue
+      continue;
     }
 
     [tiles[emptyIndex], tiles[swapIndex]] = [tiles[swapIndex], tiles[emptyIndex]];
@@ -106,10 +118,12 @@ function shuffleBoard(count = 200) {
   }
   renderBoard();
   Flip.from(state, {
-    duration: 2,
-    ease: "power3.out",
-    targets: "#board > div:not(.opacity-0)",
+    delay: 2,
+    duration: 1,
+    ease: "power4.inOut",
+    targets: "#board > div",
     overwrite: "auto",
+    stagger: 0.1,
   });
 }
 
