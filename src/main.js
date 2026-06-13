@@ -24,12 +24,13 @@ function renderBoard() {
   tiles.forEach((value, index) => {
     const tile = document.createElement("div");
     tile.className =
-      "aspect-square flex items-center justify-center outline-1 text-amber-50/0 bg-neutral-500 cursor-pointer select-none";
+      "aspect-square flex items-center justify-center outline-1 text-amber-50/100 bg-neutral-500 cursor-pointer select-none";
     if (value === 24) {
       tile.classList.add("opacity-0", "pointer-events-none");
     } else {
       const [origCol, origRow] = indexToPos(value - 1);
-      tile.textContent = `${value} - ${origRow}:${origCol}`;
+      tile.textContent = `${value}`;
+      // tile.textContent = `${value} - ${origRow}:${origCol}`;
       tile.dataset.flipId = `tile-${value}`;
       tile.style.backgroundPosition = `${origCol * 20}% ${origRow * 33.3333}%`;
     }
@@ -88,11 +89,13 @@ function shuffleBoard(count = 200) {
     let emptyPos = indexToPos(emptyIndex);
 
     if (swapIndex >= tiles.length || swapIndex < 0) {
+      shuffleMove--
       continue;
     }
 
     if (Math.abs(step) === 1 && swapPos[1] !== emptyPos[1]) {
-      continue;
+      shuffleMove--;
+      continue
     }
 
     [tiles[emptyIndex], tiles[swapIndex]] = [tiles[swapIndex], tiles[emptyIndex]];
@@ -111,6 +114,5 @@ function shuffleBoard(count = 200) {
 }
 
 renderBoard();
-// shuffleBoard();
 
 document.getElementById("new-game").addEventListener("click", () => shuffleBoard(500));
