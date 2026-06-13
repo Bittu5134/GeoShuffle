@@ -27,29 +27,73 @@ function posToIndex(col, row) {
 }
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function renderBoard(addText = true) {
+// 1. Clean up renderBoard so the text target wrapper always exists
+// 1. Update renderBoard so tile 24 is ready to be revealed smoothly
+function renderBoard(isGameWon = false) {
   board.innerHTML = "";
 
   tiles.forEach((value, index) => {
     const tile = document.createElement("div");
-
     tile.className =
       "boardTileIndex aspect-square flex items-center justify-center text-2xl font-black select-none cursor-pointer";
+
+    // Set up the map imagery for ALL tiles right away
+    tile.style.backgroundImage = `url('${currentMap["image"]}')`;
+    tile.dataset.flipId = `tile-${value}`;
+    const [origCol, origRow] = indexToPos(value - 1);
+    tile.style.backgroundPosition = `${origCol * 20}% ${origRow * 33.3333}%`;
+
     if (value === 24) {
-      tile.classList.add("opacity-0", "pointer-events-none");
+      // Add a unique identifier class so GSAP can target the hidden tile later
+      tile.classList.add("empty-tile"); 
+      
+      if (!isGameWon) {
+        tile.classList.add("opacity-0", "pointer-events-none");
+      }
     } else {
-      const [origCol, origRow] = indexToPos(value - 1);
-      if (addText === true) tile.textContent = `${value}`;
-      // tile.textContent = `${value} - ${origRow}:${origCol}`;
-      tile.style.backgroundImage = `url('${currentMap["image"]}')`;
-      tile.dataset.flipId = `tile-${value}`;
-      tile.style.backgroundPosition = `${origCol * 20}% ${origRow * 33.3333}%`;
+      // If the game isn't won yet, keep the text span active
+      if (!isGameWon) {
+        tile.innerHTML = `<span class="tile-number">${value}</span>`;
+      }
     }
+
     tile.addEventListener("click", () => moveTile(index));
     board.appendChild(tile);
   });
 }
 
+// 2. Synchronize the fade-out of numbers with the fade-in of tile 24
+function victory() {
+  // Lock the board so the user can't click things mid-celebration animation
+  board.classList.add("pointer-events-none");
+
+  // Create a master GSAP timeline to coordinate the effects perfectly
+  const tl = gsap.timeline({
+    onComplete: () => {
+      // Once all fades complete, lock in the official permanent win state structural render
+      renderBoard(true);
+      board.classList.add("win-state");
+      board.classList.remove("pointer-events-none");
+    }
+  });
+
+  // Fade the numbers out
+  tl.to(".tile-number", {
+    opacity: 0,
+    scale: 0.5,
+    duration: 0.5,
+    ease: "power2.in",
+    stagger: 0.01,
+  }, 0); // The '0' means start right away
+
+  // Smoothly fade tile 24's missing map slice IN at the exact same time!
+  tl.to(".empty-tile", {
+    opacity: 1,
+    duration: 0.5,
+    ease: "power2.out"
+  }, 0); 
+}
+// 2. Clear out the duplicate layout definitions inside moveTile
 function moveTile(index) {
   const emptyIndex = tiles.indexOf(24);
   const [tileCol, tileRow] = indexToPos(index);
@@ -58,11 +102,7 @@ function moveTile(index) {
   if ((tileCol === emptyCol) === (tileRow === emptyRow)) return;
   const state = Flip.getState("#board > div");
 
-  // You'll never know how many hours I spent simplifying it.
-
   let step;
-
-  // Confusing naming scheme, will change later ig... (its already a lot better than the previous mess)
   if (tileRow === emptyRow) {
     if (tileCol < emptyCol) step = 1;
     else step = -1;
@@ -77,22 +117,19 @@ function moveTile(index) {
     tiles[curr] = tiles[next];
     curr = next;
   }
-
   tiles[index] = 24;
 
-  isVictory = tiles.every((value, index) => value === tilesEnd[index]);
-  if (isVictory) {
-    console.log("Victory condition met!");
-    renderBoard(false);
-  } else {
-    renderBoard();
-  }
+  renderBoard(false);
   Flip.from(state, {
-    duration: 0.2,
-    ease: "power2.in",
+    duration: 0.35,
+    ease: "power3.out",
     targets: "#board > div:not(.opacity-0)",
     overwrite: "auto",
   });
+  const isVictory = tiles.every((val, i) => val === tilesEnd[i]);
+  if (isVictory) {
+    victory();
+  }
 }
 
 function shuffleBoard(count = 200) {
@@ -127,7 +164,7 @@ function shuffleBoard(count = 200) {
   }
   renderBoard();
   Flip.from(state, {
-    delay: 1.5,
+    delay: 2,
     duration: 1,
     ease: "power4.inOut",
     targets: "#board > div",
@@ -136,6 +173,7 @@ function shuffleBoard(count = 200) {
   });
 }
 
+
 shuffleBoard();
 
-document.getElementById("new-game").addEventListener("click", () => shuffleBoard(500));
+document.getElementById("new-game").addEventListener("click", () => shuffleBoard());

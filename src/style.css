@@ -19,11 +19,17 @@ h1 {
 #board > div {
   background-size: 600% 400%;
   background-repeat: no-repeat;
+  transition: opacity 0.5s ease;
 }
 
 .boardTileIndex {
   color: white;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+#board.win-state div {
+  outline: none !important; /* Removes layout lines so the map looks unified! */
+  box-shadow: none !important;
 }
 
 /* --- THE POSITIONAL CORNER GUARD SYSTEM --- */
