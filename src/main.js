@@ -7,6 +7,7 @@ gsap.registerPlugin(Flip);
 const board = document.getElementById("board");
 const COLS = 6;
 const ROWS = 4;
+let isVictory = false;
 
 let tiles = [...Array(24).keys()].map((i) => i + 1);
 const tilesEnd = [...tiles];
@@ -26,18 +27,19 @@ function posToIndex(col, row) {
 }
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function renderBoard() {
+function renderBoard(addText = true) {
   board.innerHTML = "";
 
   tiles.forEach((value, index) => {
     const tile = document.createElement("div");
+
     tile.className =
-      "aspect-square flex items-center justify-center outline-1 text-amber-50/75 bg-auto cursor-pointer select-none";
+      "boardTileIndex aspect-square flex items-center justify-center text-2xl font-black select-none cursor-pointer";
     if (value === 24) {
       tile.classList.add("opacity-0", "pointer-events-none");
     } else {
       const [origCol, origRow] = indexToPos(value - 1);
-      tile.textContent = `${value}`;
+      if (addText === true) tile.textContent = `${value}`;
       // tile.textContent = `${value} - ${origRow}:${origCol}`;
       tile.style.backgroundImage = `url('${currentMap["image"]}')`;
       tile.dataset.flipId = `tile-${value}`;
@@ -77,10 +79,17 @@ function moveTile(index) {
   }
 
   tiles[index] = 24;
-  renderBoard();
+
+  isVictory = tiles.every((value, index) => value === tilesEnd[index]);
+  if (isVictory) {
+    console.log("Victory condition met!");
+    renderBoard(false);
+  } else {
+    renderBoard();
+  }
   Flip.from(state, {
-    duration: 0.35,
-    ease: "power3.out",
+    duration: 0.2,
+    ease: "power2.in",
     targets: "#board > div:not(.opacity-0)",
     overwrite: "auto",
   });
@@ -88,7 +97,7 @@ function moveTile(index) {
 
 function shuffleBoard(count = 200) {
   tiles = [...tilesEnd];
-  renderBoard()
+  renderBoard();
   const state = Flip.getState("#board > div");
   currentMap = earthData[Math.floor(Math.random() * earthData.length)];
   for (let shuffleMove = 0; shuffleMove <= count; shuffleMove++) {
@@ -118,7 +127,7 @@ function shuffleBoard(count = 200) {
   }
   renderBoard();
   Flip.from(state, {
-    delay: 2,
+    delay: 1.5,
     duration: 1,
     ease: "power4.inOut",
     targets: "#board > div",
@@ -127,6 +136,6 @@ function shuffleBoard(count = 200) {
   });
 }
 
-renderBoard();
+shuffleBoard();
 
 document.getElementById("new-game").addEventListener("click", () => shuffleBoard(500));

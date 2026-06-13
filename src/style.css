@@ -21,6 +21,11 @@ h1 {
   background-repeat: no-repeat;
 }
 
+.boardTileIndex {
+  color: white;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
 /* --- THE POSITIONAL CORNER GUARD SYSTEM --- */
 /* Elements dynamically inherit corner rounding based on their visual slot placement, not their value */
 #board > div:nth-child(1)  { border-top-left-radius: 0.5rem; }
