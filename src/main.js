@@ -164,7 +164,7 @@ function shuffleBoard(count = 200) {
   }
   renderBoard();
   Flip.from(state, {
-    delay: 2,
+    delay: 1.5,
     duration: 1,
     ease: "power4.inOut",
     targets: "#board > div",
@@ -172,7 +172,6 @@ function shuffleBoard(count = 200) {
     stagger: 0.1,
   });
 }
-
 
 shuffleBoard();
 

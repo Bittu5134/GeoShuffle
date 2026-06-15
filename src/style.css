@@ -19,7 +19,6 @@ h1 {
 #board > div {
   background-size: 600% 400%;
   background-repeat: no-repeat;
-  transition: opacity 0.5s ease;
 }
 
 .boardTileIndex {
@@ -27,10 +26,18 @@ h1 {
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
+#board {
+  transition-duration: 1000ms;
+}
+
 #board.win-state div {
   outline: none !important; /* Removes layout lines so the map looks unified! */
   box-shadow: none !important;
 }
+/* 
+#board.win-state {
+  scale: 1.5;
+} */
 
 /* --- THE POSITIONAL CORNER GUARD SYSTEM --- */
 /* Elements dynamically inherit corner rounding based on their visual slot placement, not their value */
