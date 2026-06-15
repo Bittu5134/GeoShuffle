@@ -1,57 +1,165 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>GeoShuffle</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
     <link rel="stylesheet" href="style.css" />
-
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Ms+Madi&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet" />
+    <link rel="preload" href="./earth.json" as="fetch" crossorigin="anonymous">
 </head>
 
-<body
-    class="bg-main-bg text-main-text min-h-screen w-full overflow-x-hidden flex flex-col items-center justify-start p-4 box-border">
-    <main class="w-full max-w-2xl flex flex-col items-center justify-center mt-2 box-border">
+<body class="bg-main-bg text-main-text min-h-screen w-full flex flex-col items-center justify-start p-4 box-border">
+    <!-- Drawer Wrapper for Settings Panel -->
+    <div class="drawer drawer-end w-full max-w-2xl">
+        <input id="settings-drawer" type="checkbox" class="drawer-toggle" />
 
-        <h1
-            class="font-extrabold text-6xl md:text-7xl text-center tracking-widest selection:bg-main-text selection:text-main-bg wrap-break-word w-full">
-            GeoShuffle
-        </h1>
+        <div class="drawer-content flex flex-col items-center w-full">
+            <!-- Header Section -->
+            <header class="w-full flex items-center justify-between mt-2 px-2 relative">
+                <h1 class="font-extrabold text-5xl md:text-6xl tracking-widest text-center mx-auto">GeoShuffle</h1>
+                <!-- Floating Settings Trigger Button -->
+                <button class="btn btn-circle btn-ghost border-2 border-main-text/20 absolute right-2 text-xl"
+                    onclick="document.getElementById('settings-drawer').checked = true">⚙️</button>
+            </header>
 
-        <div class="flex items-center justify-between w-full max-w-xl m-6 px-4 box-border">
-            <div class="flex gap-2">
-                <div
-                    class="flex flex-col items-center bg-current/20 border-4 border-current/10 rounded-xl px-3 py-2 min-w-[70px]">
-                    <span class="text-xs uppercase font-bold">Time</span>
-                    <span class="text-2xl font-extrabold">00:00</span>
+            <!-- Live Dashboard Stats Banner -->
+            <div class="flex items-center justify-between w-full max-w-xl m-6 px-4 box-border">
+                <div class="flex gap-4">
+                    <div
+                        class="flex flex-col items-center bg-main-text/10 border-4 border-main-text/10 rounded-xl px-4 py-2 min-w-[90px]">
+                        <span class="text-xs uppercase font-bold tracking-wider opacity-75">Time</span>
+                        <span class="text-2xl font-extrabold" id="stat-time">00:00</span>
+                    </div>
+                    <div
+                        class="flex flex-col items-center bg-main-text/10 border-4 border-main-text/10 rounded-xl px-4 py-2 min-w-[90px]">
+                        <span class="text-xs uppercase font-bold tracking-wider opacity-75">Moves</span>
+                        <span class="text-2xl font-extrabold" id="stat-moves">0</span>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center border-4 border-current/20 rounded-xl px-3 py-2 min-w-[70px]">
-                    <span class="text-xs uppercase font-bold">Moves</span>
-                    <span class="text-2xl font-extrabold">0</span>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <button class="btn p-4 md:p-6 text-lg md:text-xl whitespace-nowrap" id="new-game">
+                <button
+                    class="btn bg-main-text text-main-bg hover:bg-main-text/90 px-6 text-lg rounded-xl font-bold border-none shadow-md"
+                    id="new-game">
                     New Game
                 </button>
             </div>
-        </div>
-<div id="board"
-    class="grid grid-cols-6 grid-rows-4 w-full max-w-xl p-0 outline-2 rounded-xl bg-secondary-bg aspect-6/4 overflow-hidden">
-</div>
 
-    </main>
+            <!-- Game Board Grid Area -->
+            <div id="board"
+                class="grid grid-cols-6 grid-rows-4 w-full max-w-xl p-0 outline-4 outline-main-text/20 rounded-2xl bg-secondary-bg aspect-[6/4] overflow-hidden shadow-2xl">
+            </div>
+
+            <!-- --- LEADERBOARD STACK CONTAINER --- -->
+            <section class="w-full max-w-xl mt-8 flex flex-col gap-8">
+                <!-- Global Leaderboard Structure -->
+                <div class="bg-secondary-bg/30 border border-main-text/10 p-4 rounded-2xl shadow-inner">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
+                        <h2 class="text-xl font-black uppercase tracking-wider flex items-center gap-2">🌐 Global
+                            Rankings</h2>
+                        <!-- YouTube Style Column Toggle -->
+                        <div class="join bg-main-text/10 p-0.5 rounded-xl" id="global-tabs">
+                            <button
+                                class="btn btn-sm join-item rounded-lg font-bold border-none bg-main-text text-main-bg"
+                                data-type="time">Speedrun (Time)</button>
+                            <button
+                                class="btn btn-sm join-item rounded-lg font-bold border-none btn-ghost text-main-text"
+                                data-type="moves">Efficiency (Moves)</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto w-full">
+                        <table class="table table-xs w-full text-center font-bold" id="global-table">
+                            <thead>
+                                <tr class="text-main-text/60 border-b border-main-text/20 text-sm">
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Time ⏱️</th>
+                                    <th>Moves 🧩</th>
+                                </tr>
+                            </thead>
+                            <tbody><!-- JavaScript Populates Dynamic Placeholders Here --></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Local Personal Records Structure -->
+                <div class="bg-secondary-bg/30 border border-main-text/10 p-4 rounded-2xl shadow-inner">
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
+                        <h2 class="text-xl font-black uppercase tracking-wider flex items-center gap-2">🏠 Personal
+                            Bests</h2>
+                        <div class="join bg-main-text/10 p-0.5 rounded-xl" id="local-tabs">
+                            <button
+                                class="btn btn-sm join-item rounded-lg font-bold border-none bg-main-text text-main-bg"
+                                data-type="time">Best Times</button>
+                            <button
+                                class="btn btn-sm join-item rounded-lg font-bold border-none btn-ghost text-main-text"
+                                data-type="moves">Fewest Moves</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto w-full">
+                        <table class="table table-xs w-full text-center font-bold" id="local-table">
+                            <thead>
+                                <tr class="text-main-text/60 border-b border-main-text/20 text-sm">
+                                    <th>Rank</th>
+                                    <th>Date</th>
+                                    <th>Time ⏱️</th>
+                                    <th>Moves 🧩</th>
+                                </tr>
+                            </thead>
+                            <tbody><!-- JavaScript Populates LocalStorage Records Here --></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Hidden Slide-Out Settings Sidebar Drawer Menu Panel -->
+        <div class="drawer-side z-50">
+            <label for="settings-drawer" class="drawer-overlay"></label>
+            <div class="p-6 w-80 min-h-screen bg-main-bg text-main-text font-bold border-l border-main-text/10">
+                <h3 class="text-2xl font-black mb-6 uppercase tracking-wide border-b pb-2 border-main-text/10">Game
+                    Settings</h3>
+
+                <div class="flex flex-col gap-6">
+                    <!-- Toggle Switch Rule for Number Overlays -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-between">
+                            <span class="label-text font-bold text-main-text text-base">Number Assist Hint</span>
+                            <input type="checkbox" id="setting-numbers" class="toggle toggle-success" checked />
+                        </label>
+                    </div>
+
+                    <!-- Audio Control Toggle Switch -->
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-between">
+                            <span class="label-text font-bold text-main-text text-base">Sound Effects</span>
+                            <input type="checkbox" id="setting-sound" class="toggle toggle-success" checked />
+                        </label>
+                    </div>
+
+                    <!-- Theme Segmented Control Layout Matrix Selector -->
+                    <div class="form-control">
+                        <span class="label-text font-bold text-main-text text-base mb-2">Display Theme</span>
+                        <div class="join w-full bg-main-text/10 p-1 rounded-xl">
+                            <button class="btn btn-xs join-item flex-1 border-none bg-main-text text-main-bg"
+                                data-theme-btn="light">☀️ Light</button>
+                            <button class="btn btn-xs join-item flex-1 border-none btn-ghost" data-theme-btn="dark">🌙
+                                Dark</button>
+                            <button class="btn btn-xs join-item flex-1 border-none btn-ghost" data-theme-btn="auto">💻
+                                Auto</button>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
-<script type="module" src="main.js"></script>
+
+<script type="module" src="./main.js"></script>
 
 </html>
-
-

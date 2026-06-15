@@ -1,47 +1,83 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-@theme {
+/* Map themes to DaisyUI's data-theme properties */
+:root, [data-theme="light"] {
   --color-main-bg: #eae7d6;
   --color-secondary-bg: #c0c5b5;
   --color-main-text: #173a31;
 }
 
+[data-theme="dark"] {
+  --color-main-bg: #121008;
+  --color-secondary-bg: #2d3027;
+  --color-main-text: #eae7d6;
+}
+
 body {
   font-family: "Fredoka", system-ui, sans-serif;
+  background-color: var(--color-main-bg);
+  color: var(--color-main-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1 {
   font-variant: small-caps;
 }
 
+#board {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
+  transition: all 1000ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
 /* Map slice configurations */
 #board > div {
   background-size: 600% 400%;
   background-repeat: no-repeat;
+  transition: outline 0.2s ease;
 }
 
+/* FIX: Replaced webkit-text-stroke with a smooth multi-layered text shadow.
+  Text stroke causes letter-forms to distort and choke on thick web fonts.
+*/
 .boardTileIndex {
-  color: white;
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-}
-
-#board {
-  transition-duration: 1000ms;
+  color: #fffdf0;
+  font-size: 1.75rem;
+  font-weight: 900;
+  text-shadow: 
+    -2px -2px 0px #173a31,  
+     2px -2px 0px #173a31,  
+    -2px  2px 0px #173a31,  
+     2px  2px 0px #173a31,
+     0px  4px 8px rgba(0,0,0,0.4);
 }
 
 #board.win-state div {
-  outline: none !important; /* Removes layout lines so the map looks unified! */
+  outline: none !important;
   box-shadow: none !important;
 }
-/* 
-#board.win-state {
-  scale: 1.5;
-} */
 
-/* --- THE POSITIONAL CORNER GUARD SYSTEM --- */
-/* Elements dynamically inherit corner rounding based on their visual slot placement, not their value */
-#board > div:nth-child(1)  { border-top-left-radius: 0.5rem; }
-#board > div:nth-child(6)  { border-top-right-radius: 0.5rem; }
-#board > div:nth-child(19) { border-bottom-left-radius: 0.5rem; }
-#board > div:nth-child(24) { border-bottom-right-radius: 0.5rem; }
+/* Styling fix for active/inactive states inside leaderboard text tables */
+.table th, .table td {
+  color: inherit; /* Dynamic text color protection inheritance */
+  border-color: rgba(23, 58, 49, 0.1);
+  padding: 0.75rem 0.5rem;
+}
+
+/* Active tab text visibility stabilizer for both subcategories */
+.join .bg-main-text {
+  background-color: var(--color-main-text) !important;
+  color: var(--color-main-bg) !important;
+}
+
+.join .btn-ghost {
+  color: var(--color-main-text) !important;
+}
+
+/* Corner Rounding Layout Safeguards */
+#board > div:nth-child(1)  { border-top-left-radius: 0.75rem; }
+#board > div:nth-child(6)  { border-top-right-radius: 0.75rem; }
+#board > div:nth-child(19) { border-bottom-left-radius: 0.75rem; }
+#board > div:nth-child(24) { border-bottom-right-radius: 0.75rem; }
