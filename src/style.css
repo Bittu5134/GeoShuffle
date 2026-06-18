@@ -1,83 +1,139 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-/* Map themes to DaisyUI's data-theme properties */
-:root, [data-theme="light"] {
-  --color-main-bg: #eae7d6;
-  --color-secondary-bg: #c0c5b5;
-  --color-main-text: #173a31;
+@plugin "daisyui/theme" {
+  name: "geoshuffle";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(91.637% 0.034 90.515);
+  --color-base-200: oklch(88.272% 0.049 91.774);
+  --color-base-300: oklch(84.133% 0.065 90.856);
+  --color-base-content: oklch(41% 0.112 45.904);
+  --color-primary: oklch(41% 0.112 45.904);
+  --color-primary-content: oklch(91.637% 0.034 90.515);
+  --color-secondary: oklch(92% 0.084 155.995);
+  --color-secondary-content: oklch(44% 0.119 151.328);
+  --color-accent: oklch(68% 0.162 75.834);
+  --color-accent-content: oklch(41% 0.112 45.904);
+  --color-neutral: oklch(41% 0.112 45.904);
+  --color-neutral-content: oklch(91.637% 0.034 90.515);
+  --color-info: oklch(58% 0.158 241.966);
+  --color-info-content: oklch(96% 0.059 95.617);
+  --color-success: oklch(51% 0.096 186.391);
+  --color-success-content: oklch(96% 0.059 95.617);
+  --color-warning: oklch(64% 0.222 41.116);
+  --color-warning-content: oklch(96% 0.059 95.617);
+  --color-error: oklch(70% 0.191 22.216);
+  --color-error-content: oklch(40% 0.123 38.172);
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
 }
 
-[data-theme="dark"] {
-  --color-main-bg: #121008;
-  --color-secondary-bg: #2d3027;
-  --color-main-text: #eae7d6;
+@plugin "daisyui/theme" {
+  name: "geoshuffle-dark";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: oklch(21% 0.006 56.043);
+  --color-base-200: oklch(14% 0.004 49.25);
+  --color-base-300: oklch(0% 0 0);
+  --color-base-content: oklch(91.637% 0.034 90.515);
+  --color-primary: oklch(91.637% 0.034 90.515);
+  --color-primary-content: oklch(21% 0.006 56.043);
+  --color-secondary: oklch(45.98% 0.248 305.03);
+  --color-secondary-content: oklch(89.196% 0.049 305.03);
+  --color-accent: oklch(64.8% 0.223 136.073);
+  --color-accent-content: oklch(0% 0 0);
+  --color-neutral: oklch(91.637% 0.034 90.515);
+  --color-neutral-content: oklch(21% 0.006 56.043);
+  --color-info: oklch(54.615% 0.215 262.88);
+  --color-info-content: oklch(90.923% 0.043 262.88);
+  --color-success: oklch(62.705% 0.169 149.213);
+  --color-success-content: oklch(12.541% 0.033 149.213);
+  --color-warning: oklch(66.584% 0.157 58.318);
+  --color-warning-content: oklch(13.316% 0.031 58.318);
+  --color-error: oklch(65.72% 0.199 27.33);
+  --color-error-content: oklch(13.144% 0.039 27.33);
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
 
 body {
-  font-family: "Fredoka", system-ui, sans-serif;
-  background-color: var(--color-main-bg);
-  color: var(--color-main-text);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-h1 {
-  font-variant: small-caps;
+  font-family: "Fredoka", sans-serif;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 #board {
   display: grid !important;
   grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
   grid-template-rows: repeat(4, minmax(0, 1fr)) !important;
-  transition: all 1000ms cubic-bezier(0.25, 1, 0.5, 1);
+  margin: 0 auto;
+  max-width: 100vh;
+  width: 100%;
 }
 
-/* Map slice configurations */
 #board > div {
   background-size: 600% 400%;
   background-repeat: no-repeat;
-  transition: outline 0.2s ease;
 }
 
-/* FIX: Replaced webkit-text-stroke with a smooth multi-layered text shadow.
-  Text stroke causes letter-forms to distort and choke on thick web fonts.
-*/
+/* --- FONT VISIBILITY SHADOW LAYER --- */
 .boardTileIndex {
+  aspect-ratio: 1 / 1 !important;
   color: #fffdf0;
-  font-size: 1.75rem;
+  user-select: none;
+  font-size: x-large;
+  color: white;
   font-weight: 900;
-  text-shadow: 
-    -2px -2px 0px #173a31,  
-     2px -2px 0px #173a31,  
-    -2px  2px 0px #173a31,  
-     2px  2px 0px #173a31,
-     0px  4px 8px rgba(0,0,0,0.4);
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
+
 
 #board.win-state div {
   outline: none !important;
-  box-shadow: none !important;
 }
 
-/* Styling fix for active/inactive states inside leaderboard text tables */
-.table th, .table td {
-  color: inherit; /* Dynamic text color protection inheritance */
-  border-color: rgba(23, 58, 49, 0.1);
+/* Custom DaisyUI table text protection override */
+.table th,
+.table td {
+  color: inherit !important;
   padding: 0.75rem 0.5rem;
 }
 
-/* Active tab text visibility stabilizer for both subcategories */
-.join .bg-main-text {
-  background-color: var(--color-main-text) !important;
-  color: var(--color-main-bg) !important;
+/* Dynamic Active YouTube-style selection tabs visibility anchor rules */
+.join .btn-active {
+  background-color: oklch(var(--n)) !important;
+  color: oklch(var(--b1)) !important;
 }
-
 .join .btn-ghost {
-  color: var(--color-main-text) !important;
+  color: oklch(var(--bc)) !important;
 }
 
-/* Corner Rounding Layout Safeguards */
-#board > div:nth-child(1)  { border-top-left-radius: 0.75rem; }
-#board > div:nth-child(6)  { border-top-right-radius: 0.75rem; }
-#board > div:nth-child(19) { border-bottom-left-radius: 0.75rem; }
-#board > div:nth-child(24) { border-bottom-right-radius: 0.75rem; }
+/* Corner Guard Rounding Anchor Matrix Rules */
+#board > div:nth-child(1) {
+  border-top-left-radius: 0.5rem;
+}
+#board > div:nth-child(6) {
+  border-top-right-radius: 0.5rem;
+}
+#board > div:nth-child(19) {
+  border-bottom-left-radius: 0.5rem;
+}
+#board > div:nth-child(24) {
+  border-bottom-right-radius: 0.5rem;
+}

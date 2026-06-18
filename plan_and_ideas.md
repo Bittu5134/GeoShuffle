@@ -121,3 +121,4 @@ Currently I use a simple logic which first checks if the clicked tile is in the 
 tomorrow I'll work on  improving the Render Function, Currently all 24 tiles are destroyed and recreated on each click, thats got to kill performance? right?
 
 ---
+
