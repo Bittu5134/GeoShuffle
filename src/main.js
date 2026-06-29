@@ -25,22 +25,23 @@ let gameActive = false;
 let numberAssist = true;
 let gridOpacity = 1;
 
-const mockGlobalData = {
-  time: [
-    { name: "Bittu", time: 342, moves: 198 },
-    { name: "GeoWiz", time: 512, moves: 245 },
-    { name: "PuzzleKing", time: 640, moves: 210 },
-    { name: "Explorer", time: 822, moves: 420 },
-    { name: "MapLover", time: 1245, moves: 652 },
-  ],
-  moves: [
-    { name: "StrategyPro", time: 1450, moves: 88 },
-    { name: "Bittu", time: 342, moves: 198 },
-    { name: "Calculated", time: 920, moves: 112 },
-    { name: "SlowSteady", time: 2410, moves: 130 },
-    { name: "Tactician", time: 1105, moves: 142 },
-  ],
+const SUPABASE_URL = "https://rmkplarqcrktdjpkegyu.supabase.co";
+const SUPABASE_KEY = "sb_publishable_uRHRP8GLVvPE1WCJ1UoWkw_Cwqm_Vn6";
+const headers = {
+  "apikey": SUPABASE_KEY,
+  "Authorization": `Bearer ${SUPABASE_KEY}`,
+  "Content-Type": "application/json"
 };
+
+let playerName = localStorage.getItem("geoPlayerName") || "Anonymous";
+const nameInput = document.getElementById("setting-name");
+if (nameInput) {
+  nameInput.value = playerName;
+  nameInput.addEventListener("input", (e) => {
+    playerName = e.target.value.trim() || "Anonymous";
+    localStorage.setItem("geoPlayerName", playerName);
+  });
+}
 
 function indexToPos(index) {
   return [index % COLS, Math.floor(index / COLS)];
@@ -66,20 +67,62 @@ function stopTimer() {
   if (timerInterval) clearInterval(timerInterval);
 }
 
-function renderLeaderboards(globalTab = "time", localTab = "time") {
+async function fetchGlobalLeaderboard(tab = "time") {
+  const column = tab === "time" ? "time_spent" : "moves_made";
+  const url = `${SUPABASE_URL}/rest/v1/leaderboard?select=player_name,time_spent,moves_made&order=${column}.asc&limit=10`;
+  try {
+    const res = await fetch(url, { headers });
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Failed to fetch global leaderboard:", err);
+    return [];
+  }
+}
+
+async function submitScore(name, time, moves) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        player_name: name,
+        time_spent: time,
+        moves_made: moves
+      })
+    });
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(`Failed to submit score: ${JSON.stringify(errData)}`);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function renderLeaderboards(globalTab = "time", localTab = "time") {
   const globalBody = document.querySelector("#global-table tbody");
+  globalBody.innerHTML = `<tr><td colspan="4" class="py-4 text-center opacity-50 italic">Loading scores...</td></tr>`;
+
+  const globalData = await fetchGlobalLeaderboard(globalTab);
+
   globalBody.innerHTML = "";
-  mockGlobalData[globalTab].forEach((player, i) => {
-    const row = document.createElement("tr");
-    row.className = "border-b border-main-text/5 hover:bg-main-text/5";
-    row.innerHTML = `
-      <td class="py-2 font-black text-amber-600">#${i + 1}</td>
-      <td>${player.name}</td>
-      <td class="${globalTab === "time" ? "text-emerald-700 font-extrabold" : ""}">${formatTime(player.time)}</td>
-      <td class="${globalTab === "moves" ? "text-emerald-700 font-extrabold" : ""}">${player.moves}</td>
-    `;
-    globalBody.appendChild(row);
-  });
+  if (globalData.length === 0) {
+    globalBody.innerHTML = `<tr><td colspan="4" class="py-4 text-center opacity-50 italic">No global scores yet!</td></tr>`;
+  } else {
+    globalData.forEach((player, i) => {
+      const row = document.createElement("tr");
+      row.className = "border-b border-main-text/5 hover:bg-main-text/5";
+      row.innerHTML = `
+        <td class="py-2 font-black text-amber-600">#${i + 1}</td>
+        <td>${player.player_name}</td>
+        <td class="${globalTab === "time" ? "text-emerald-700 font-extrabold" : ""}">${formatTime(player.time_spent)}</td>
+        <td class="${globalTab === "moves" ? "text-emerald-700 font-extrabold" : ""}">${player.moves_made}</td>
+      `;
+      globalBody.appendChild(row);
+    });
+  }
 
   const localBody = document.querySelector("#local-table tbody");
   localBody.innerHTML = "";
@@ -196,7 +239,7 @@ function moveTile(index) {
   }
 }
 
-function victory() {
+async function victory() {
   gameActive = false;
   stopTimer();
   board.classList.add("pointer-events-none");
@@ -209,6 +252,9 @@ function victory() {
   };
   localHistory.push(currentRun);
   localStorage.setItem("geoHistory", JSON.stringify(localHistory));
+
+  // Submit to Supabase
+  await submitScore(playerName, timeElapsed, moveCount);
   renderLeaderboards(activeGlobalTab, activeLocalTab);
 
   const tl = gsap.timeline({
@@ -332,3 +378,4 @@ shuffleBoard()
 renderLeaderboards();
 
 document.getElementById("new-game").addEventListener("click", () => shuffleBoard(150));
+

@@ -122,3 +122,46 @@ tomorrow I'll work on  improving the Render Function, Currently all 24 tiles are
 
 ---
 
+Devlog #8: Worked on Leaderboard, Primitive Settings, Scores and Timings
+
+This is going to be a quick follow-up of the last devlog. 
+
+Here is what I have achieved since last time
+
+- Scores ✅
+- Local Leaderboard ✅
+- Global Leaderboard
+- Discord login for Leaderboard (or some other way)
+- Multiplayer
+- settings ✅ (somewhat working)
+- Build a P2P solution
+- SHow real life location
+
+<!-- IMAGE OF SCORES -->
+
+ok so firstly I removed the old `Moves`/`Best Moves` from the top and instead set it to track `Moves`/`Time Taken`.
+Cause I found that new users will take more time on average to finish a puzzle while pros who can easily finish the puzzle would rather like to compete with time, So I figured players should be allowed to track both
+
+<!-- IMAGE OF LEADERBOARD -->
+
+I also started work on a leaderboard that would show both `time spent` and `moves made` to finish a puzzle.
+I decided to use `Time Spent` as the default sorting order. (Mojority of the people dont care about moves 🥀)
+
+There is going to be a local leaderboard and a global leaderboad, and as the name implies one will contain scores from all the players and the other will only show your scores. (in the curent version the gloable leaderboard does not function)
+
+<!-- IMAGE OF SETTINGS UI -->
+
+I also started using a Modal based Settings popup, these fit the style of the site imo, also im using the DaisyUI Componets for TailwindCSS to make these modals, the settings menu is simple rn, but I do plan to add more fetures in it.
+
+<!-- IMAGE OF FULL UI -->
+
+ALso as you might have noticed from the previous screenshots the UI has the been changed, I fully leaned into the Tailwind Ecosystem and I made a Custom DaisyUI theme to use on the site, Actually Two Themes, A light and a dark one.
+
+Ofcours the current theme is placeholder, I still want to tweak it to fit my original inpiration for the website theme ([The Chobani Cups](https://www.google.com/search?sxsrf=ANbL-n6m_n5Y6JSG3Z9JCBRCU4Ol5Q44ow:1781802092991&udm=2&q=chobani+yogurt))
+
+With all that being said, I still need to implement lots of other features like sounds and multiplayer, which will take time.
+I am somewhat obsessed with distributed systems and so I wanna make the multiplayer version peer to peer and decentralised.
+ok thats enough for today, more in the next journel! (Is this how journelling is done? idk im just saying whatever I want)
+
+---
+

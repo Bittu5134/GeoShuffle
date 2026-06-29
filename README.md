@@ -1,2 +1,0 @@
-Work in progress GeoSHuffle Game project
-
