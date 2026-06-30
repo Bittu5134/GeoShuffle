@@ -1,5 +1,5 @@
-import { fetchGlobalLeaderboard, getLocalHistory } from "./js/api.js";
-import { formatTime } from "./js/timer.js";
+import { fetchGlobalLeaderboard, getLocalHistory } from "./api.js";
+import { formatTime } from "./timer.js";
 
 let activeGlobalTab = "time";
 let activeLocalTab = "time";
@@ -10,7 +10,6 @@ async function renderFullLeaderboard() {
 
   tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center opacity-50 italic">Loading rankings...</td></tr>`;
 
-  // Fetch up to 100 entries for the full leaderboard page
   const data = await fetchGlobalLeaderboard(activeGlobalTab, 100);
 
   tbody.innerHTML = "";
@@ -46,7 +45,8 @@ function renderLocalLeaderboard() {
 
   const sortedLocal = [...localHistory]
     .sort((a, b) => {
-      if (activeLocalTab === "time") return a.time - b.time || a.moves - b.moves;
+      if (activeLocalTab === "time")
+        return a.time - b.time || a.moves - b.moves;
       return a.moves - b.moves || a.time - b.time;
     })
     .slice(0, 100);

@@ -45,7 +45,11 @@ export async function submitScore(name, time, moves) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
       method: "POST",
       headers,
-      body: JSON.stringify({ player_name: name, time_spent: time, moves_made: moves }),
+      body: JSON.stringify({
+        player_name: name,
+        time_spent: time,
+        moves_made: moves,
+      }),
     });
     if (!res.ok) {
       const errData = await res.json();
@@ -59,7 +63,10 @@ export async function submitScore(name, time, moves) {
 export async function getScoreRank(timeSpent) {
   const url = `${SUPABASE_URL}/rest/v1/leaderboard?time_spent=lt.${timeSpent}`;
   try {
-    const res = await fetch(url, { method: "GET", headers: { ...headers, Prefer: "count=exact" } });
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { ...headers, Prefer: "count=exact" },
+    });
     const countHeader = res.headers.get("content-range");
     if (countHeader && countHeader.includes("/")) {
       const parts = countHeader.split("/");
@@ -76,12 +83,42 @@ export async function getScoreRank(timeSpent) {
 }
 
 export const defaultNames = [
-  "GeoWiz", "MapLover", "GlobeTrotter", "AtlasExplorer", "TerraSearcher",
-  "GridSlider", "CompassClimber", "GeoQuest", "CartoCrafter", "LatitudeLeaper",
-  "VectorVoyager", "TopoTracker", "MeridianMind", "OrbitFinder", "AzimuthAce",
-  "WaypointWanderer", "BorderBounder", "PixelPathfinder", "LandmarkHunter",
-  "ScaleSeeker", "DatumDrifter", "GisGuru", "LegendReader", "TerrainTamer",
-  "EquatorEnthusiast", "ZoneZenith", "ApexAtlas", "ChartChaser", "SpheroidScout",
-  "PlotMaster", "ContoursCruiser", "GeoGenius", "MapMatrix", "VistaVoyage",
-  "GlobeGlider", "HorizonHiker", "CoordCommander", "TerraTechie",
+  "GeoWiz",
+  "MapLover",
+  "GlobeTrotter",
+  "AtlasExplorer",
+  "TerraSearcher",
+  "GridSlider",
+  "CompassClimber",
+  "GeoQuest",
+  "CartoCrafter",
+  "LatitudeLeaper",
+  "VectorVoyager",
+  "TopoTracker",
+  "MeridianMind",
+  "OrbitFinder",
+  "AzimuthAce",
+  "WaypointWanderer",
+  "BorderBounder",
+  "PixelPathfinder",
+  "LandmarkHunter",
+  "ScaleSeeker",
+  "DatumDrifter",
+  "GisGuru",
+  "LegendReader",
+  "TerrainTamer",
+  "EquatorEnthusiast",
+  "ZoneZenith",
+  "ApexAtlas",
+  "ChartChaser",
+  "SpheroidScout",
+  "PlotMaster",
+  "ContoursCruiser",
+  "GeoGenius",
+  "MapMatrix",
+  "VistaVoyage",
+  "GlobeGlider",
+  "HorizonHiker",
+  "CoordCommander",
+  "TerraTechie",
 ];

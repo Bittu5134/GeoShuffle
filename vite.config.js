@@ -13,8 +13,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "src/index.html"),
-        leaderboard: resolve(__dirname, "src/leaderboard.html")
-      }
-    }
+        leaderboard: resolve(__dirname, "src/leaderboard.html"),
+      },
+    },
   },
 });

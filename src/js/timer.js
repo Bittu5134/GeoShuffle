@@ -2,7 +2,9 @@ let timerInterval = null;
 let timeElapsed = 0;
 
 export function formatTime(totalSeconds) {
-  const mins = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+  const mins = Math.floor(totalSeconds / 60)
+    .toString()
+    .padStart(2, "0");
   const secs = (totalSeconds % 60).toString().padStart(2, "0");
   return `${mins}:${secs}`;
 }
@@ -39,11 +41,14 @@ export function updateLocationPanel(currentMap, showFullDetails = false) {
   if (!detailsEl || !linkEl) return;
 
   if (showFullDetails) {
-    const locationName = [currentMap.region, currentMap.country].filter(Boolean).join(", ");
+    const locationName = [currentMap.region, currentMap.country]
+      .filter(Boolean)
+      .join(", ");
     detailsEl.textContent = locationName || "Unknown Location";
     linkEl.href = currentMap.map || "#";
     linkEl.textContent = "🌐 View on Google Maps";
-    linkEl.className = "btn btn-success font-bold rounded-xl text-xs sm:text-sm shadow-md";
+    linkEl.className =
+      "btn btn-success font-bold rounded-xl text-xs sm:text-sm shadow-md";
     linkEl.style.opacity = "1";
   } else {
     detailsEl.textContent = "Location is hidden!";
@@ -51,12 +56,14 @@ export function updateLocationPanel(currentMap, showFullDetails = false) {
     if (timeElapsed >= 60) {
       linkEl.href = currentMap.map || "#";
       linkEl.textContent = "📍 Open in Maps (Hint)";
-      linkEl.className = "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm shadow-md";
+      linkEl.className =
+        "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm shadow-md";
       linkEl.style.opacity = "1";
     } else {
       linkEl.href = "#";
       linkEl.textContent = `🔒 Hint in ${60 - timeElapsed}s`;
-      linkEl.className = "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm";
+      linkEl.className =
+        "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm";
       linkEl.style.opacity = "0.5";
     }
   }

@@ -1,16 +1,33 @@
-import { 
-  getPlayerName, setPlayerName, defaultNames, 
-  addLocalHistoryRun, submitScore, getScoreRank, fetchGlobalLeaderboard 
-} from "./js/api.js";
-import { 
-  shuffleBoard, renderBoard, registerCallbacks, 
-  getCurrentMap, getMoveCount, getNumberAssist, setNumberAssist, setGameActive 
-} from "./js/game.js";
-import { 
-  startTimer, stopTimer, resetTimer, getTimeElapsed, formatTime, updateLocationPanel 
-} from "./js/timer.js";
-import { generateScorecard } from "./js/scorecard.js";
-import { setupSocialShareLinks, triggerNativeShare } from "./js/share.js";
+import {
+  getPlayerName,
+  setPlayerName,
+  defaultNames,
+  addLocalHistoryRun,
+  submitScore,
+  getScoreRank,
+  fetchGlobalLeaderboard,
+} from "./api.js";
+import {
+  shuffleBoard,
+  renderBoard,
+  registerCallbacks,
+  getCurrentMap,
+  getMoveCount,
+  getNumberAssist,
+  setNumberAssist,
+  setGameActive,
+} from "./game.js";
+import {
+  startTimer,
+  stopTimer,
+  resetTimer,
+  getTimeElapsed,
+  formatTime,
+  updateLocationPanel,
+} from "./timer.js";
+import { generateScorecard } from "./scorecard.js";
+import { setupSocialShareLinks, triggerNativeShare } from "./share.js";
+import { triggerConfetti } from "./utils.js";
 
 let activeGlobalTab = "time";
 let activeLocalTab = "time";
@@ -52,18 +69,6 @@ function setupProfile() {
   }
 }
 
-function triggerConfetti() {
-  if (typeof confetti !== "function") return;
-  const duration = 3 * 1000;
-  const end = Date.now() + duration;
-
-  (function frame() {
-    confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, zIndex: 10000 });
-    confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, zIndex: 10000 });
-    if (Date.now() < end) requestAnimationFrame(frame);
-  })();
-}
-
 async function handleVictory() {
   stopTimer();
   triggerConfetti();
@@ -87,7 +92,12 @@ async function handleVictory() {
   document.getElementById("victory-rank").textContent = rank;
 
   generateScorecard(getCurrentMap(), formatTime(finalTime), finalMoves, rank);
-  setupSocialShareLinks(getCurrentMap(), formatTime(finalTime), finalMoves, rank);
+  setupSocialShareLinks(
+    getCurrentMap(),
+    formatTime(finalTime),
+    finalMoves,
+    rank,
+  );
 
   renderGlobalLeaderboard();
 
@@ -133,7 +143,8 @@ function renderLocalLeaderboard() {
 
   const sortedLocal = [...localHistory]
     .sort((a, b) => {
-      if (activeLocalTab === "time") return a.time - b.time || a.moves - b.moves;
+      if (activeLocalTab === "time")
+        return a.time - b.time || a.moves - b.moves;
       return a.moves - b.moves || a.time - b.time;
     })
     .slice(0, 5);
@@ -170,10 +181,12 @@ function setupTabToggle(containerId, callback) {
 document.addEventListener("DOMContentLoaded", () => {
   setupProfile();
 
-  document.getElementById("setting-numbers")?.addEventListener("change", (e) => {
-    setNumberAssist(e.target.checked);
-    renderBoard(false);
-  });
+  document
+    .getElementById("setting-numbers")
+    ?.addEventListener("change", (e) => {
+      setNumberAssist(e.target.checked);
+      renderBoard(false);
+    });
 
   const savedTheme = localStorage.getItem("geoTheme") || "geoshuffle";
   document.documentElement.setAttribute("data-theme", savedTheme);
@@ -205,7 +218,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let targetTheme = e.target.dataset.themeBtn;
       if (targetTheme === "auto") {
-        targetTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        targetTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
       }
       document.documentElement.setAttribute("data-theme", targetTheme);
       localStorage.setItem("geoTheme", targetTheme);
@@ -225,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("new-game")?.addEventListener("click", () => {
     resetTimer();
     document.getElementById("stat-time").textContent = "00:00";
-    shuffleBoard(5);
+    shuffleBoard(200);
   });
 
   const locationLink = document.getElementById("location-link");
@@ -252,26 +267,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  document.getElementById("btn-native-share")?.addEventListener("click", async (e) => {
-    e.preventDefault();
-    const finalTime = getTimeElapsed();
-    const finalMoves = getMoveCount();
-    const rank = document.getElementById("victory-rank").textContent;
-    await triggerNativeShare(getCurrentMap(), formatTime(finalTime), finalMoves, rank);
-  });
+  document
+    .getElementById("btn-native-share")
+    ?.addEventListener("click", async (e) => {
+      e.preventDefault();
+      const finalTime = getTimeElapsed();
+      const finalMoves = getMoveCount();
+      const rank = document.getElementById("victory-rank").textContent;
+      await triggerNativeShare(
+        getCurrentMap(),
+        formatTime(finalTime),
+        finalMoves,
+        rank,
+      );
+    });
 
-  registerCallbacks(
-    () => {
-      if (getTimeElapsed() === 0 && getMoveCount() === 0) {
-        startTimer((seconds) => {
-          const timerEl = document.getElementById("stat-time");
-          if (timerEl) timerEl.textContent = formatTime(seconds);
-          updateLocationPanel(getCurrentMap(), false);
-        });
-      }
-    },
-    handleVictory
-  );
+  registerCallbacks(() => {
+    if (getTimeElapsed() === 0 && getMoveCount() === 0) {
+      startTimer((seconds) => {
+        const timerEl = document.getElementById("stat-time");
+        if (timerEl) timerEl.textContent = formatTime(seconds);
+        updateLocationPanel(getCurrentMap(), false);
+      });
+    }
+  }, handleVictory);
 
   setGameActive(false);
   shuffleBoard(200);

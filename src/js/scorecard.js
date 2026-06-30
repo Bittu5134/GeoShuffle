@@ -27,7 +27,8 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
   baseImg.crossOrigin = "anonymous";
 
   if (currentMap.image.startsWith("http")) {
-    baseImg.src = "https://images.weserv.nl/?url=" + encodeURIComponent(currentMap.image);
+    baseImg.src =
+      "https://images.weserv.nl/?url=" + encodeURIComponent(currentMap.image);
   } else {
     baseImg.src = currentMap.image;
   }
@@ -60,7 +61,9 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.strokeStyle = "#000000";
     ctx.lineJoin = "round";
 
-    const locationName = [currentMap.region, currentMap.country].filter(Boolean).join(", ");
+    const locationName = [currentMap.region, currentMap.country]
+      .filter(Boolean)
+      .join(", ");
 
     const solvedLocText = "Solved Location";
     const solvedLocX = Math.floor(w * 0.04);

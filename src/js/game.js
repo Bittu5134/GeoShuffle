@@ -1,6 +1,6 @@
 import { gsap } from "gsap";
 import { Flip } from "gsap/Flip";
-import earthData from "../earth.json";
+import earthData from "../data/earth.json";
 import { updateLocationPanel } from "./timer.js";
 
 gsap.registerPlugin(Flip);
@@ -17,26 +17,46 @@ let numberAssist = true;
 let gridOpacity = 1;
 let gameActive = false;
 
-export function getTiles() { return tiles; }
-export function setTiles(arr) { tiles = [...arr]; }
+export function getTiles() {
+  return tiles;
+}
+export function setTiles(arr) {
+  tiles = [...arr];
+}
 
-export function getTilesEnd() { return tilesEnd; }
+export function getTilesEnd() {
+  return tilesEnd;
+}
 
-export function getCurrentMap() { return currentMap; }
-export function setCurrentMap(map) { currentMap = map; }
+export function getCurrentMap() {
+  return currentMap;
+}
+export function setCurrentMap(map) {
+  currentMap = map;
+}
 
-export function getMoveCount() { return moveCount; }
+export function getMoveCount() {
+  return moveCount;
+}
 export function setMoveCount(val) {
   moveCount = val;
   const movesEl = document.getElementById("stat-moves");
   if (movesEl) movesEl.textContent = val;
 }
 
-export function getNumberAssist() { return numberAssist; }
-export function setNumberAssist(val) { numberAssist = val; }
+export function getNumberAssist() {
+  return numberAssist;
+}
+export function setNumberAssist(val) {
+  numberAssist = val;
+}
 
-export function getGameActive() { return gameActive; }
-export function setGameActive(val) { gameActive = val; }
+export function getGameActive() {
+  return gameActive;
+}
+export function setGameActive(val) {
+  gameActive = val;
+}
 
 export function indexToPos(index) {
   return [index % COLS, Math.floor(index / COLS)];
@@ -49,7 +69,8 @@ export function renderBoard(isGameWon = false) {
 
   tiles.forEach((value, index) => {
     const tile = document.createElement("div");
-    tile.className = "boardTileIndex aspect-square flex items-center justify-center select-none cursor-pointer";
+    tile.className =
+      "boardTileIndex aspect-square flex items-center justify-center select-none cursor-pointer";
     tile.style.backgroundImage = `url('${currentMap.image}')`;
     tile.dataset.flipId = `tile-${value}`;
 
@@ -78,7 +99,7 @@ export function renderBoard(isGameWon = false) {
 export function shuffleBoard(count = 200, onShuffleComplete = null) {
   const board = document.getElementById("board");
   if (!board) return;
-  
+
   board.classList.remove("win-state");
   setMoveCount(0);
 
@@ -102,9 +123,10 @@ export function shuffleBoard(count = 200, onShuffleComplete = null) {
     if (emptyRow < ROWS - 1) neighbors.push(emptyIndex + COLS);
 
     const validMoves = neighbors.filter((idx) => idx !== lastMovedIdx);
-    const nextIdx = validMoves.length > 0
-      ? validMoves[Math.floor(Math.random() * validMoves.length)]
-      : neighbors[Math.floor(Math.random() * neighbors.length)];
+    const nextIdx =
+      validMoves.length > 0
+        ? validMoves[Math.floor(Math.random() * validMoves.length)]
+        : neighbors[Math.floor(Math.random() * neighbors.length)];
 
     tiles[emptyIndex] = tiles[nextIdx];
     tiles[nextIdx] = 24;

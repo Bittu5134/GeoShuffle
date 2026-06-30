@@ -29,7 +29,9 @@ export function copyToClipboardFallback(text) {
 }
 
 export function buildSharePayload(currentMap, timeText, movesText, rankText) {
-  const locationName = [currentMap.region, currentMap.country].filter(Boolean).join(", ");
+  const locationName = [currentMap.region, currentMap.country]
+    .filter(Boolean)
+    .join(", ");
   const shareUrl = "https://geoshuffle.bittu.dev";
   const mapLink = currentMap.map || "#";
 
@@ -39,8 +41,14 @@ export function buildSharePayload(currentMap, timeText, movesText, rankText) {
   return { shareText, shareTextWithImg, shareUrl, locationName, mapLink };
 }
 
-export function setupSocialShareLinks(currentMap, timeText, movesText, rankText) {
-  const { shareText, shareTextWithImg, shareUrl, locationName } = buildSharePayload(currentMap, timeText, movesText, rankText);
+export function setupSocialShareLinks(
+  currentMap,
+  timeText,
+  movesText,
+  rankText,
+) {
+  const { shareText, shareTextWithImg, shareUrl, locationName } =
+    buildSharePayload(currentMap, timeText, movesText, rankText);
   const redditTitle = `I solved today's GeoShuffle satellite puzzle in ${timeText}!`;
 
   const shareTwitter = document.getElementById("share-twitter");
@@ -79,15 +87,29 @@ export function setupSocialShareLinks(currentMap, timeText, movesText, rankText)
   }
 }
 
-export async function triggerNativeShare(currentMap, timeText, movesText, rankText) {
-  const { shareText, shareTextWithImg, shareUrl } = buildSharePayload(currentMap, timeText, movesText, rankText);
+export async function triggerNativeShare(
+  currentMap,
+  timeText,
+  movesText,
+  rankText,
+) {
+  const { shareText, shareTextWithImg, shareUrl } = buildSharePayload(
+    currentMap,
+    timeText,
+    movesText,
+    rankText,
+  );
 
   const imgEl = document.getElementById("scorecard-preview");
   const dataUrl = imgEl ? imgEl.src : null;
 
   if (navigator.share) {
     try {
-      let shareData = { title: "GeoShuffle Solve", text: shareText, url: shareUrl };
+      let shareData = {
+        title: "GeoShuffle Solve",
+        text: shareText,
+        url: shareUrl,
+      };
 
       if (dataUrl && dataUrl.startsWith("data:image")) {
         try {
@@ -103,9 +125,16 @@ export async function triggerNativeShare(currentMap, timeText, movesText, rankTe
       await navigator.share(shareData);
       return;
     } catch (err) {
-      console.warn("Native file sharing failed, trying text-only sharing:", err);
+      console.warn(
+        "Native file sharing failed, trying text-only sharing:",
+        err,
+      );
       try {
-        await navigator.share({ title: "GeoShuffle Solve", text: shareTextWithImg, url: shareUrl });
+        await navigator.share({
+          title: "GeoShuffle Solve",
+          text: shareTextWithImg,
+          url: shareUrl,
+        });
         return;
       } catch (fallbackErr) {
         console.error("Native text share failed:", fallbackErr);

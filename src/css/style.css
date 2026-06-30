@@ -73,7 +73,9 @@
 
 body {
   font-family: "Fredoka", sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 #board {
@@ -97,7 +99,11 @@ body {
   user-select: none;
   font-size: x-large;
   font-weight: 900;
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 
 #board.win-state div {
@@ -122,10 +128,18 @@ body {
 }
 
 /* Corner Guard Rounding Anchor Matrix Rules */
-#board > div:nth-child(1) { border-top-left-radius: 0.5rem; }
-#board > div:nth-child(6) { border-top-right-radius: 0.5rem; }
-#board > div:nth-child(19) { border-bottom-left-radius: 0.5rem; }
-#board > div:nth-child(24) { border-bottom-right-radius: 0.5rem; }
+#board > div:nth-child(1) {
+  border-top-left-radius: 0.5rem;
+}
+#board > div:nth-child(6) {
+  border-top-right-radius: 0.5rem;
+}
+#board > div:nth-child(19) {
+  border-bottom-left-radius: 0.5rem;
+}
+#board > div:nth-child(24) {
+  border-bottom-right-radius: 0.5rem;
+}
 
 /* Neo-Brutalism Outline & Shadow Title Styling */
 .neo-brutal-title {
@@ -133,7 +147,10 @@ body {
   -webkit-text-stroke: 1.5px #000000;
   paint-order: stroke fill;
   text-shadow: 3px 3px 0px #000000;
-  transition: color 0.3s ease, -webkit-text-stroke 0.3s ease, text-shadow 0.3s ease;
+  transition:
+    color 0.3s ease,
+    -webkit-text-stroke 0.3s ease,
+    text-shadow 0.3s ease;
 }
 
 @media (min-width: 640px) {
@@ -153,7 +170,10 @@ body {
   background-color: var(--color-base-100);
   color: var(--color-base-content);
   box-shadow: 3px 3px 0px 0.5px var(--color-neutral) !important;
-  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.2s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    background-color 0.2s ease;
   cursor: pointer;
   user-select: none;
 }
@@ -171,12 +191,36 @@ body {
 }
 
 /* Colors variants */
-.neo-btn-primary { background-color: var(--color-primary) !important; color: var(--color-primary-content) !important; border-color: var(--color-neutral) !important; }
-.neo-btn-success { background-color: var(--color-success) !important; color: var(--color-success-content) !important; border-color: var(--color-neutral) !important; }
-.neo-btn-warning { background-color: var(--color-warning) !important; color: var(--color-warning-content) !important; border-color: var(--color-neutral) !important; }
-.neo-btn-accent { background-color: var(--color-accent) !important; color: var(--color-accent-content) !important; border-color: var(--color-neutral) !important; }
-.neo-btn-neutral { background-color: var(--color-neutral) !important; color: var(--color-neutral-content) !important; border-color: var(--color-neutral) !important; }
-.neo-btn-outline { background-color: transparent !important; color: var(--color-base-content) !important; border-color: var(--color-neutral) !important; }
+.neo-btn-primary {
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary-content) !important;
+  border-color: var(--color-neutral) !important;
+}
+.neo-btn-success {
+  background-color: var(--color-success) !important;
+  color: var(--color-success-content) !important;
+  border-color: var(--color-neutral) !important;
+}
+.neo-btn-warning {
+  background-color: var(--color-warning) !important;
+  color: var(--color-warning-content) !important;
+  border-color: var(--color-neutral) !important;
+}
+.neo-btn-accent {
+  background-color: var(--color-accent) !important;
+  color: var(--color-accent-content) !important;
+  border-color: var(--color-neutral) !important;
+}
+.neo-btn-neutral {
+  background-color: var(--color-neutral) !important;
+  color: var(--color-neutral-content) !important;
+  border-color: var(--color-neutral) !important;
+}
+.neo-btn-outline {
+  background-color: transparent !important;
+  color: var(--color-base-content) !important;
+  border-color: var(--color-neutral) !important;
+}
 
 /* Square size variants */
 .neo-btn-square {
