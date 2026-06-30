@@ -42,6 +42,7 @@ export function setMoveCount(val) {
   moveCount = val;
   const movesEl = document.getElementById("stat-moves");
   if (movesEl) movesEl.textContent = val;
+  if (onMoveCallback) onMoveCallback(val);
 }
 
 export function getNumberAssist() {
@@ -56,6 +57,9 @@ export function getGameActive() {
 }
 export function setGameActive(val) {
   gameActive = val;
+}
+export function getEarthData() {
+  return earthData;
 }
 
 export function indexToPos(index) {
@@ -148,13 +152,15 @@ export function shuffleBoard(count = 200, onShuffleComplete = null) {
   });
 }
 
-// Binds external triggers for move tick callback and victory callback
+// Binds external triggers for move tick callback, victory callback, and move update callback
 let onTimerStartCallback = null;
 let onVictoryCallback = null;
+let onMoveCallback = null;
 
-export function registerCallbacks(onTimerStart, onVictory) {
+export function registerCallbacks(onTimerStart, onVictory, onMove) {
   onTimerStartCallback = onTimerStart;
   onVictoryCallback = onVictory;
+  onMoveCallback = onMove;
 }
 
 function handleTileClick(index) {

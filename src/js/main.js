@@ -7,31 +7,31 @@ import {
   getScoreRank,
   fetchGlobalLeaderboard,
 } from "./api.js";
-import {
-  shuffleBoard,
-  renderBoard,
-  registerCallbacks,
-  getCurrentMap,
-  getMoveCount,
-  getNumberAssist,
-  setNumberAssist,
-  setGameActive,
+import { 
+  shuffleBoard, renderBoard, registerCallbacks, 
+  getCurrentMap, getMoveCount, getNumberAssist, setNumberAssist, setGameActive,
+  getTiles, setTiles, setCurrentMap, getEarthData
 } from "./game.js";
-import {
-  startTimer,
-  stopTimer,
-  resetTimer,
-  getTimeElapsed,
-  formatTime,
-  updateLocationPanel,
+import { 
+  startTimer, stopTimer, resetTimer, getTimeElapsed, formatTime, updateLocationPanel 
 } from "./timer.js";
 import { generateScorecard } from "./scorecard.js";
 import { setupSocialShareLinks, triggerNativeShare } from "./share.js";
 import { triggerConfetti } from "./utils.js";
+import {
+  initMultiplayer, hostGame, joinGame, startQuickMatch, cancelMultiplayer,
+  getRoomCode, getRole, isConnected, sendGameStart, sendVictory, sendMoveUpdate,
+  requestNewGame, disconnectOpponent, preConnectPeer, sendOpponentReadyReplay
+} from "./multiplayer.js";
 
 let activeGlobalTab = "time";
 let activeLocalTab = "time";
 let playerName = getPlayerName();
+let opponentSolved = false;
+let weSolved = false;
+let weClickedPlayAgain = false;
+let opponentClickedPlayAgain = false;
+let onlineCountIntervalId = null;
 
 function setupProfile() {
   if (!localStorage.getItem("geoPlayerName")) {
@@ -69,6 +69,207 @@ function setupProfile() {
   }
 }
 
+// --- MULTIPLAYER COORDINATION HANDLERS ---
+
+function isRandomMatch() {
+  const code = getRoomCode();
+  return code && code.startsWith("MATCH-");
+}
+
+function handleMatchStart(mapIndex, tiles) {
+  stopTimer();
+  resetTimer();
+  document.getElementById("stat-time").textContent = "00:00";
+  
+  opponentSolved = false;
+  weSolved = false;
+  weClickedPlayAgain = false;
+  opponentClickedPlayAgain = false;
+
+  const replayBtn = document.getElementById("btn-victory-replay");
+  if (replayBtn) {
+    replayBtn.disabled = false;
+    replayBtn.classList.remove("btn-disabled");
+    replayBtn.textContent = "🎮 Play Again";
+  }
+
+  const earthData = getEarthData();
+  const map = earthData[mapIndex];
+  setCurrentMap(map);
+  setTiles(tiles);
+  renderBoard(false);
+  updateLocationPanel(map, false);
+  
+  document.getElementById("stat-moves").textContent = "0";
+  document.getElementById("stat-opponent-moves").textContent = "0";
+  
+  setGameActive(true);
+  
+  startTimer((seconds) => {
+    const timerEl = document.getElementById("stat-time");
+    if (timerEl) timerEl.textContent = formatTime(seconds);
+    updateLocationPanel(map, false);
+  });
+
+  const newGameBtn = document.getElementById("new-game");
+  if (newGameBtn) {
+    newGameBtn.disabled = true;
+    newGameBtn.classList.add("btn-disabled");
+  }
+}
+
+function handleOpponentReadyReplay() {
+  opponentClickedPlayAgain = true;
+  
+  if (!isRandomMatch()) {
+    if (weClickedPlayAgain) {
+      if (getRole() === "host") {
+        const earthData = getEarthData();
+        const randomMapIdx = Math.floor(Math.random() * earthData.length);
+        shuffleBoard(5, () => {
+          const map = earthData[randomMapIdx];
+          setCurrentMap(map);
+          sendGameStart(randomMapIdx, getTiles());
+          handleMatchStart(randomMapIdx, getTiles());
+        });
+      } else {
+        requestNewGame();
+      }
+    } else {
+      const replayBtn = document.getElementById("btn-victory-replay");
+      if (replayBtn) {
+        replayBtn.textContent = "🎮 Play Again (Opponent Ready)";
+      }
+    }
+  }
+}
+
+function handleOpponentMove(moves) {
+  const oppMovesEl = document.getElementById("stat-opponent-moves");
+  if (oppMovesEl) oppMovesEl.textContent = moves;
+}
+
+function handleOpponentVictory(timeSpent, movesMade) {
+  opponentSolved = true;
+  const statusText = document.getElementById("mp-status-text");
+  if (statusText) {
+    statusText.textContent = `Opponent solved the puzzle in ${formatTime(timeSpent)} (${movesMade} moves)! Keep going to finish!`;
+    statusText.classList.add("text-rose-600");
+  }
+
+  // If in quick match and we haven't finished yet, present options
+  if (isRandomMatch() && !weSolved) {
+    const oppWonTimeEl = document.getElementById("opp-won-time");
+    const oppWonMovesEl = document.getElementById("opp-won-moves");
+    if (oppWonTimeEl) oppWonTimeEl.textContent = formatTime(timeSpent);
+    if (oppWonMovesEl) oppWonMovesEl.textContent = movesMade;
+    
+    const oppWonModal = document.getElementById("opponent_won_modal");
+    if (oppWonModal) oppWonModal.showModal();
+  }
+
+  // If we are in a private match and we already completed it, activate the Play Again button!
+  if (isConnected() && !isRandomMatch() && weSolved) {
+    const replayBtn = document.getElementById("btn-victory-replay");
+    if (replayBtn) {
+      replayBtn.disabled = false;
+      replayBtn.classList.remove("btn-disabled");
+      replayBtn.textContent = "🎮 Play Again";
+    }
+  }
+}
+
+function handleOpponentDisconnect() {
+  if (isRandomMatch()) {
+    // If it was a quick match, do NOT go back to solo automatically!
+    const statusText = document.getElementById("mp-status-text");
+    if (statusText) {
+      if (weSolved) {
+        statusText.textContent = "Match finished. Ready to search again.";
+      } else {
+        statusText.textContent = "Opponent disconnected. Finish your run to search again.";
+      }
+      statusText.classList.remove("text-rose-600");
+    }
+    
+    // Hide opponent moves stats since opponent left
+    document.getElementById("stat-opponent-container")?.classList.add("hidden");
+    
+    const replayBtn = document.getElementById("btn-victory-replay");
+    if (replayBtn) {
+      replayBtn.disabled = false;
+      replayBtn.classList.remove("btn-disabled");
+      replayBtn.textContent = "🎮 Play Again";
+    }
+    return;
+  }
+
+  const statusText = document.getElementById("mp-status-text");
+  if (statusText) {
+    statusText.textContent = "Opponent disconnected. Returning to Solo Mode.";
+    statusText.classList.remove("text-rose-600");
+  }
+  
+  document.getElementById("stat-opponent-container")?.classList.add("hidden");
+  document.getElementById("mp-room-badge")?.classList.add("hidden");
+  document.getElementById("mp-panel-status")?.classList.add("hidden");
+  
+  const newGameBtn = document.getElementById("new-game");
+  if (newGameBtn) {
+    newGameBtn.disabled = false;
+    newGameBtn.classList.remove("btn-disabled");
+  }
+  
+  // Also unlock replay button if opponent disconnected
+  const replayBtn = document.getElementById("btn-victory-replay");
+  if (replayBtn) {
+    replayBtn.disabled = false;
+    replayBtn.classList.remove("btn-disabled");
+    replayBtn.textContent = "🎮 Play Again";
+  }
+
+  const disconnectBtn = document.getElementById("btn-cancel-mp");
+  if (disconnectBtn) disconnectBtn.classList.add("hidden");
+}
+
+function handleStatusUpdate(status) {
+  const statusText = document.getElementById("mp-status-text");
+  if (statusText) {
+    statusText.textContent = status;
+    statusText.classList.remove("text-rose-600");
+  }
+
+  const code = getRoomCode();
+  const active = isConnected() || !!code || status.includes("Searching") || status.includes("Handshaking");
+  
+  const statusBadge = document.getElementById("mp-panel-status");
+  if (statusBadge) {
+    if (active) statusBadge.classList.remove("hidden");
+    else statusBadge.classList.add("hidden");
+  }
+
+  const disconnectBtn = document.getElementById("btn-cancel-mp");
+  if (disconnectBtn) {
+    if (active) disconnectBtn.classList.remove("hidden");
+    else disconnectBtn.classList.add("hidden");
+  }
+
+  const badge = document.getElementById("mp-room-badge");
+  const codeEl = document.getElementById("mp-room-code");
+  if (code) {
+    if (badge) badge.classList.remove("hidden");
+    if (codeEl) codeEl.textContent = code;
+  } else {
+    if (badge) badge.classList.add("hidden");
+  }
+
+  const oppContainer = document.getElementById("stat-opponent-container");
+  if (oppContainer) {
+    if (isConnected()) oppContainer.classList.remove("hidden");
+    else oppContainer.classList.add("hidden");
+  }
+}
+
 async function handleVictory() {
   stopTimer();
   triggerConfetti();
@@ -76,6 +277,12 @@ async function handleVictory() {
   const finalTime = getTimeElapsed();
   const finalMoves = getMoveCount();
   const dateStr = new Date().toLocaleDateString();
+
+  weSolved = true;
+
+  if (isConnected()) {
+    sendVictory(finalTime, finalMoves);
+  }
 
   addLocalHistoryRun({ date: dateStr, time: finalTime, moves: finalMoves });
   renderLocalLeaderboard();
@@ -87,17 +294,28 @@ async function handleVictory() {
   renderBoard(true);
   updateLocationPanel(getCurrentMap(), true);
 
+  // If in private lobby and opponent hasn't solved yet, wait for them!
+  if (isConnected() && !isRandomMatch()) {
+    const replayBtn = document.getElementById("btn-victory-replay");
+    if (replayBtn) {
+      if (!opponentSolved) {
+        replayBtn.disabled = true;
+        replayBtn.classList.add("btn-disabled");
+        replayBtn.textContent = "🔒 Waiting for Opponent...";
+      } else {
+        replayBtn.disabled = false;
+        replayBtn.classList.remove("btn-disabled");
+        replayBtn.textContent = "🎮 Play Again";
+      }
+    }
+  }
+
   await submitScore(playerName, finalTime, finalMoves);
   const rank = await getScoreRank(finalTime);
   document.getElementById("victory-rank").textContent = rank;
 
   generateScorecard(getCurrentMap(), formatTime(finalTime), finalMoves, rank);
-  setupSocialShareLinks(
-    getCurrentMap(),
-    formatTime(finalTime),
-    finalMoves,
-    rank,
-  );
+  setupSocialShareLinks(getCurrentMap(), formatTime(finalTime), finalMoves, rank);
 
   renderGlobalLeaderboard();
 
@@ -181,6 +399,26 @@ function setupTabToggle(containerId, callback) {
 document.addEventListener("DOMContentLoaded", () => {
   setupProfile();
 
+  window.toggleMpPanel = function() {
+    const content = document.getElementById("mp-panel-content");
+    const toggle = document.getElementById("mp-panel-toggle");
+    if (!content || !toggle) return;
+    if (content.classList.contains("hidden")) {
+      content.classList.remove("hidden");
+      toggle.textContent = "Collapse ▲";
+      preConnectPeer(); // Warm up connection
+      
+      // Start global online count polling on expand!
+      if (!onlineCountIntervalId) {
+        updateOnlineCount();
+        onlineCountIntervalId = setInterval(updateOnlineCount, 45000);
+      }
+    } else {
+      content.classList.add("hidden");
+      toggle.textContent = "Expand ▼";
+    }
+  };
+
   document
     .getElementById("setting-numbers")
     ?.addEventListener("change", (e) => {
@@ -240,7 +478,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("new-game")?.addEventListener("click", () => {
     resetTimer();
     document.getElementById("stat-time").textContent = "00:00";
-    shuffleBoard(200);
+    shuffleBoard(5);
   });
 
   const locationLink = document.getElementById("location-link");
@@ -253,12 +491,70 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  async function updateOnlineCount() {
+    const countEl = document.getElementById("mp-online-count");
+    if (!countEl) return;
+    try {
+      const probeId = "probe-" + Math.random().toString(36).substring(2, 8);
+      const res = await fetch("https://peerbasket.bittu.dev/basket/geoshuffle-online?limit=1", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ peer_id: probeId })
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      countEl.textContent = `${data.total_peers} online`;
+      countEl.classList.remove("opacity-50");
+    } catch (err) {
+      countEl.textContent = "Online";
+      countEl.classList.add("opacity-50");
+    }
+  }
+
   const victoryModalElement = document.getElementById("victory_modal");
   if (victoryModalElement) {
     victoryModalElement.addEventListener("close", () => {
-      resetTimer();
-      document.getElementById("stat-time").textContent = "00:00";
-      shuffleBoard(150);
+      weClickedPlayAgain = true;
+      
+      if (isRandomMatch()) {
+        // Quick Match: immediately search for a new game
+        startQuickMatch();
+      } else if (isConnected()) {
+        // Private Lobby: both need to click Play Again before Host starts!
+        sendOpponentReadyReplay();
+        
+        if (opponentClickedPlayAgain) {
+          if (getRole() === "host") {
+            const earthData = getEarthData();
+            const randomMapIdx = Math.floor(Math.random() * earthData.length);
+            shuffleBoard(5, () => {
+              const map = earthData[randomMapIdx];
+              setCurrentMap(map);
+              sendGameStart(randomMapIdx, getTiles());
+              handleMatchStart(randomMapIdx, getTiles());
+            });
+          } else {
+            resetTimer();
+            document.getElementById("stat-time").textContent = "00:00";
+            document.getElementById("mp-status-text").textContent = "Requested replay. Starting game...";
+            requestNewGame();
+          }
+        } else {
+          // Waiting for opponent
+          resetTimer();
+          document.getElementById("stat-time").textContent = "00:00";
+          if (getRole() === "host") {
+            document.getElementById("mp-status-text").textContent = "Ready to replay. Waiting for guest...";
+          } else {
+            document.getElementById("mp-status-text").textContent = "Ready to replay. Waiting for host...";
+          }
+        }
+      } else {
+        // Solo mode
+        resetTimer();
+        document.getElementById("stat-time").textContent = "00:00";
+        shuffleBoard(5);
+      }
     });
     victoryModalElement.addEventListener("click", (e) => {
       if (e.target === victoryModalElement) {
@@ -282,18 +578,102 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     });
 
-  registerCallbacks(() => {
-    if (getTimeElapsed() === 0 && getMoveCount() === 0) {
-      startTimer((seconds) => {
-        const timerEl = document.getElementById("stat-time");
-        if (timerEl) timerEl.textContent = formatTime(seconds);
-        updateLocationPanel(getCurrentMap(), false);
-      });
+  // --- MULTIPLAYER P2P INITIALIZATION ---
+  initMultiplayer({
+    onStatusUpdate: handleStatusUpdate,
+    onConnectionEstablished: () => {
+      if (getRole() === "host") {
+        const earthData = getEarthData();
+        const randomMapIdx = Math.floor(Math.random() * earthData.length);
+        
+        // Host shuffles board first, then shares with Guest
+        shuffleBoard(5, () => {
+          const map = earthData[randomMapIdx];
+          setCurrentMap(map);
+          sendGameStart(randomMapIdx, getTiles());
+          handleMatchStart(randomMapIdx, getTiles());
+        });
+      }
+    },
+    onMatchStart: handleMatchStart,
+    onOpponentMove: handleOpponentMove,
+    onOpponentVictory: handleOpponentVictory,
+    onOpponentDisconnect: handleOpponentDisconnect,
+    onRequestNewGame: () => {
+      if (getRole() === "host" && weClickedPlayAgain) {
+        const earthData = getEarthData();
+        const randomMapIdx = Math.floor(Math.random() * earthData.length);
+        shuffleBoard(5, () => {
+          const map = earthData[randomMapIdx];
+          setCurrentMap(map);
+          sendGameStart(randomMapIdx, getTiles());
+          handleMatchStart(randomMapIdx, getTiles());
+        });
+      }
+    },
+    onOpponentReadyReplay: handleOpponentReadyReplay
+  });
+
+  // Bind Multiplayer Control Panel Buttons
+  document.getElementById("btn-quick-match")?.addEventListener("click", () => {
+    startQuickMatch();
+  });
+
+  document.getElementById("btn-host-lobby")?.addEventListener("click", () => {
+    hostGame();
+  });
+
+  document.getElementById("btn-join-lobby")?.addEventListener("click", () => {
+    const codeInput = document.getElementById("mp-join-input");
+    if (codeInput && codeInput.value.trim()) {
+      joinGame(codeInput.value.trim());
     }
-  }, handleVictory);
+  });
+
+  document.getElementById("btn-cancel-mp")?.addEventListener("click", () => {
+    cancelMultiplayer();
+    
+    // Enable Manual Shuffle button
+    const newGameBtn = document.getElementById("new-game");
+    if (newGameBtn) {
+      newGameBtn.disabled = false;
+      newGameBtn.classList.remove("btn-disabled");
+    }
+  });
+
+  document.getElementById("btn-opp-won-keep")?.addEventListener("click", () => {
+    const oppWonModal = document.getElementById("opponent_won_modal");
+    if (oppWonModal) oppWonModal.close();
+  });
+
+  document.getElementById("btn-opp-won-new")?.addEventListener("click", () => {
+    const oppWonModal = document.getElementById("opponent_won_modal");
+    if (oppWonModal) oppWonModal.close();
+    startQuickMatch();
+  });
+
+  registerCallbacks(
+    () => {
+      if (getTimeElapsed() === 0 && getMoveCount() === 0) {
+        startTimer((seconds) => {
+          const timerEl = document.getElementById("stat-time");
+          if (timerEl) timerEl.textContent = formatTime(seconds);
+          updateLocationPanel(getCurrentMap(), false);
+        });
+      }
+    }, 
+    handleVictory,
+    (moves) => {
+      if (isConnected()) {
+        sendMoveUpdate(moves);
+      }
+    }
+  );
+
+  // Online count is initialized on multiplayer panel expansion
 
   setGameActive(false);
-  shuffleBoard(200);
+  shuffleBoard(5);
   renderGlobalLeaderboard();
   renderLocalLeaderboard();
 });
