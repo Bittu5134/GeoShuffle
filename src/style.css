@@ -115,13 +115,16 @@ body {
   padding: 0.75rem 0.5rem;
 }
 
-/* Dynamic Active YouTube-style selection tabs visibility anchor rules */
+/* Dynamic Active selection tabs visibility rules */
 .join .btn-active {
   background-color: oklch(var(--n)) !important;
   color: oklch(var(--b1)) !important;
+  font-weight: 800 !important;
 }
 .join .btn-ghost {
   color: oklch(var(--bc)) !important;
+  font-weight: 500 !important;
+  opacity: 0.7;
 }
 
 /* Corner Guard Rounding Anchor Matrix Rules */
@@ -136,4 +139,13 @@ body {
 }
 #board > div:nth-child(24) {
   border-bottom-right-radius: 0.5rem;
+}
+
+/* Neo-Brutalism Outline & Shadow Title Styling */
+.neo-brutal-title {
+  color: #ffffff !important;
+  -webkit-text-stroke: 4px #000000;
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0px #000000;
+  transition: color 0.3s ease, -webkit-text-stroke 0.3s ease, text-shadow 0.3s ease;
 }
