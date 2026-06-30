@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" data-theme="geoshuffle">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GeoShuffle - Leaderboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body class="bg-base-100 text-base-content min-h-screen w-full">
+
+  <main class="w-full max-w-4xl mx-auto p-4 box-border">
+
+    <header class="flex items-center justify-between mb-6">
+      <h1 class="text-4xl md:text-6xl font-black tracking-widest uppercase small-caps neo-brutal-title">GeoShuffle</h1>
+      <a href="./index.html" class="btn btn-outline border-neutral border-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all font-bold rounded-xl">
+        🎮 Play Game
+      </a>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mt-8">
+      
+      <!-- Global Rankings -->
+      <article class="bg-base-100 border-4 border-neutral rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+        <div
+          class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 border-b-2 border-neutral/10">
+          <h2 class="text-xl sm:text-2xl font-black tracking-wide">🏆 Global (Top 100)</h2>
+          <div id="full-tabs" class="join bg-base-300/30 p-0.5 rounded-xl">
+            <button class="btn btn-sm join-item font-bold border-none btn-active" data-type="time">Time</button>
+            <button class="btn btn-sm join-item font-bold border-none btn-ghost" data-type="moves">Moves</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table id="full-table" class="table w-full text-center font-bold">
+            <thead>
+              <tr class="text-base-content/60 border-b border-neutral/20 text-xs sm:text-sm">
+                <th>#</th>
+                <th>Player</th>
+                <th>Time</th>
+                <th>Moves</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+
+      <!-- Personal Bests (Local) -->
+      <article class="bg-base-100 border-4 border-neutral rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+        <div
+          class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 border-b-2 border-neutral/10">
+          <h2 class="text-xl sm:text-2xl font-black tracking-wide">🏠 Personal Bests</h2>
+          <div id="local-tabs" class="join bg-base-300/30 p-0.5 rounded-xl">
+            <button class="btn btn-sm join-item font-bold border-none btn-active" data-type="time">Time</button>
+            <button class="btn btn-sm join-item font-bold border-none btn-ghost" data-type="moves">Moves</button>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table id="local-table" class="table w-full text-center font-bold">
+            <thead>
+              <tr class="text-base-content/60 border-b border-neutral/20 text-xs sm:text-sm">
+                <th>#</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Moves</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+      
+    </div>
+
+  </main>
+
+  <script type="module" src="./leaderboard.js"></script>
+</body>
+
+</html>
