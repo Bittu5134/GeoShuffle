@@ -156,56 +156,22 @@ function updateLocationPanel(showFullDetails = false) {
     linkEl.style.opacity = "1";
   } else {
     detailsEl.textContent = "Location is hidden!";
-    linkEl.href = currentMap.map || "#";
 
     if (timeElapsed >= 60) {
+      linkEl.href = currentMap.map || "#";
       linkEl.textContent = "📍 Open in Maps (Hint)";
-      linkEl.className = "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm";
+      linkEl.className = "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm shadow-md";
       linkEl.style.opacity = "1";
     } else {
-      linkEl.textContent = "🔒 Hint Locked";
+      linkEl.href = "#";
+      linkEl.textContent = `🔒 Hint in ${60 - timeElapsed}s`;
       linkEl.className = "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm";
       linkEl.style.opacity = "0.5";
     }
   }
 }
 
-function showToast(message, type = "warning") {
-  const container = document.getElementById("toast-container");
-  if (!container) return;
 
-  // Clear existing toasts to prevent cluttering
-  container.innerHTML = "";
-
-  const toast = document.createElement("div");
-  toast.className = `alert alert-${type} border-4 border-neutral font-bold rounded-xl shadow-md flex items-center justify-between gap-4 py-2 px-3 sm:py-3 sm:px-4 pointer-events-auto`;
-
-  let emoji = "🔒";
-  if (type === "success") emoji = "✅";
-  else if (type === "info") emoji = "📢";
-  else if (type === "error") emoji = "❌";
-
-  toast.innerHTML = `
-    <div class="flex items-center gap-2">
-      <span>${emoji}</span>
-      <span>${message}</span>
-    </div>
-    <button class="btn btn-xs sm:btn-sm btn-ghost btn-circle border-none font-bold" onclick="this.parentElement.parentElement.remove()">✕</button>
-  `;
-
-  const toastWrapper = document.createElement("div");
-  toastWrapper.className = "pointer-events-auto";
-  toastWrapper.appendChild(toast);
-
-  container.appendChild(toastWrapper);
-
-  // Auto remove after 4 seconds
-  setTimeout(() => {
-    if (toastWrapper.parentElement) {
-      toastWrapper.remove();
-    }
-  }, 4000);
-}
 
 async function fetchGlobalLeaderboard(tab = "time") {
   const column = tab === "time" ? "time_spent" : "moves_made";
@@ -559,7 +525,17 @@ function copyToClipboardFallback(text) {
   textarea.select();
   try {
     document.execCommand("copy");
-    showToast("Stats copied to clipboard!", "success");
+    const btn = document.getElementById("btn-copy-share");
+    if (btn) {
+      const originalHtml = btn.innerHTML;
+      btn.innerHTML = `
+        <span class="text-lg">✅</span>
+        <span class="text-[9px] uppercase opacity-75">Copied!</span>
+      `;
+      setTimeout(() => {
+        btn.innerHTML = originalHtml;
+      }, 2000);
+    }
   } catch (err) {
     console.error("execCommand fallback failed:", err);
   }
@@ -796,10 +772,9 @@ document.getElementById("new-game").addEventListener("click", () => shuffleBoard
 const locationLink = document.getElementById("location-link");
 if (locationLink) {
   locationLink.addEventListener("click", (e) => {
-    if (gameActive && timeElapsed < 60) {
+    const href = locationLink.getAttribute("href");
+    if (href === "#" || !href) {
       e.preventDefault();
-      const secondsLeft = 60 - timeElapsed;
-      showToast(`Hint unlocks in ${formatTime(secondsLeft)}!`, "warning");
     }
   });
 }
@@ -808,6 +783,12 @@ const victoryModalElement = document.getElementById("victory_modal");
 if (victoryModalElement) {
   victoryModalElement.addEventListener("close", () => {
     shuffleBoard(150);
+  });
+  // Exit modal when clicking on the backdrop background area
+  victoryModalElement.addEventListener("click", (e) => {
+    if (e.target === victoryModalElement) {
+      victoryModalElement.close();
+    }
   });
 }
 document.getElementById("btn-native-share")?.addEventListener("click", async (e) => {
