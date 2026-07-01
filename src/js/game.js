@@ -100,7 +100,11 @@ export function renderBoard(isGameWon = false) {
   });
 }
 
-export function shuffleBoard(count = 200, onShuffleComplete = null, specificMap = null) {
+export function shuffleBoard(
+  count = 200,
+  onShuffleComplete = null,
+  specificMap = null,
+) {
   const board = document.getElementById("board");
   if (!board) return;
 
@@ -226,7 +230,7 @@ function handleTileClick(index) {
               onVictoryCallback();
             }
           },
-        }
+        },
       );
     } else {
       if (onVictoryCallback) {

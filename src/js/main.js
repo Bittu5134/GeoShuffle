@@ -569,10 +569,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const earthData = getEarthData();
             const randomMapIdx = Math.floor(Math.random() * earthData.length);
             const map = earthData[randomMapIdx];
-            shuffleBoard(5, () => {
-              sendGameStart(randomMapIdx, getTiles());
-              handleMatchStart(randomMapIdx, getTiles());
-            }, map);
+            shuffleBoard(
+              5,
+              () => {
+                sendGameStart(randomMapIdx, getTiles());
+                handleMatchStart(randomMapIdx, getTiles());
+              },
+              map,
+            );
           } else {
             resetTimer();
             document.getElementById("stat-time").textContent = "00:00";
@@ -631,10 +635,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const map = earthData[randomMapIdx];
 
         // Host shuffles board first, then shares with Guest
-        shuffleBoard(5, () => {
-          sendGameStart(randomMapIdx, getTiles());
-          handleMatchStart(randomMapIdx, getTiles());
-        }, map);
+        shuffleBoard(
+          5,
+          () => {
+            sendGameStart(randomMapIdx, getTiles());
+            handleMatchStart(randomMapIdx, getTiles());
+          },
+          map,
+        );
       }
     },
     onMatchStart: handleMatchStart,
@@ -646,10 +654,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const earthData = getEarthData();
         const randomMapIdx = Math.floor(Math.random() * earthData.length);
         const map = earthData[randomMapIdx];
-        shuffleBoard(5, () => {
-          sendGameStart(randomMapIdx, getTiles());
-          handleMatchStart(randomMapIdx, getTiles());
-        }, map);
+        shuffleBoard(
+          5,
+          () => {
+            sendGameStart(randomMapIdx, getTiles());
+            handleMatchStart(randomMapIdx, getTiles());
+          },
+          map,
+        );
       }
     },
     onOpponentReadyReplay: handleOpponentReadyReplay,
