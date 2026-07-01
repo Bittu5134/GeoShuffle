@@ -17,7 +17,11 @@ export function setPlayerName(name) {
 }
 
 export function getLocalHistory() {
-  return JSON.parse(localStorage.getItem("geoHistory")) || [];
+  try {
+    return JSON.parse(localStorage.getItem("geoHistory")) || [];
+  } catch (e) {
+    return [];
+  }
 }
 
 export function addLocalHistoryRun(run) {

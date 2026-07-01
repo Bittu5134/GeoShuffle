@@ -24,9 +24,9 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
   const ctx = canvas.getContext("2d");
 
   const baseImg = new Image();
-  baseImg.crossOrigin = "anonymous";
 
   if (currentMap.image.startsWith("http")) {
+    baseImg.crossOrigin = "anonymous";
     baseImg.src =
       "https://images.weserv.nl/?url=" + encodeURIComponent(currentMap.image);
   } else {

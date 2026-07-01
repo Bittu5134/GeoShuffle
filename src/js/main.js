@@ -6,22 +6,49 @@ import {
   submitScore,
   getScoreRank,
   fetchGlobalLeaderboard,
+  getLocalHistory,
 } from "./api.js";
-import { 
-  shuffleBoard, renderBoard, registerCallbacks, 
-  getCurrentMap, getMoveCount, getNumberAssist, setNumberAssist, setGameActive,
-  getTiles, setTiles, setCurrentMap, getEarthData
+import {
+  shuffleBoard,
+  renderBoard,
+  registerCallbacks,
+  getCurrentMap,
+  getMoveCount,
+  getNumberAssist,
+  setNumberAssist,
+  setGameActive,
+  getTiles,
+  setTiles,
+  setCurrentMap,
+  getEarthData,
 } from "./game.js";
-import { 
-  startTimer, stopTimer, resetTimer, getTimeElapsed, formatTime, updateLocationPanel 
+import {
+  startTimer,
+  stopTimer,
+  resetTimer,
+  getTimeElapsed,
+  formatTime,
+  updateLocationPanel,
 } from "./timer.js";
 import { generateScorecard } from "./scorecard.js";
 import { setupSocialShareLinks, triggerNativeShare } from "./share.js";
 import { triggerConfetti } from "./utils.js";
 import {
-  initMultiplayer, hostGame, joinGame, startQuickMatch, cancelMultiplayer,
-  getRoomCode, getRole, isConnected, sendGameStart, sendVictory, sendMoveUpdate,
-  requestNewGame, disconnectOpponent, preConnectPeer, sendOpponentReadyReplay
+  initMultiplayer,
+  hostGame,
+  joinGame,
+  startQuickMatch,
+  cancelMultiplayer,
+  getRoomCode,
+  getRole,
+  isConnected,
+  sendGameStart,
+  sendVictory,
+  sendMoveUpdate,
+  requestNewGame,
+  disconnectOpponent,
+  preConnectPeer,
+  sendOpponentReadyReplay,
 } from "./multiplayer.js";
 
 let activeGlobalTab = "time";
@@ -80,7 +107,7 @@ function handleMatchStart(mapIndex, tiles) {
   stopTimer();
   resetTimer();
   document.getElementById("stat-time").textContent = "00:00";
-  
+
   opponentSolved = false;
   weSolved = false;
   weClickedPlayAgain = false;
@@ -99,12 +126,12 @@ function handleMatchStart(mapIndex, tiles) {
   setTiles(tiles);
   renderBoard(false);
   updateLocationPanel(map, false);
-  
+
   document.getElementById("stat-moves").textContent = "0";
   document.getElementById("stat-opponent-moves").textContent = "0";
-  
+
   setGameActive(true);
-  
+
   startTimer((seconds) => {
     const timerEl = document.getElementById("stat-time");
     if (timerEl) timerEl.textContent = formatTime(seconds);
@@ -120,7 +147,7 @@ function handleMatchStart(mapIndex, tiles) {
 
 function handleOpponentReadyReplay() {
   opponentClickedPlayAgain = true;
-  
+
   if (!isRandomMatch()) {
     if (weClickedPlayAgain) {
       if (getRole() === "host") {
@@ -163,7 +190,7 @@ function handleOpponentVictory(timeSpent, movesMade) {
     const oppWonMovesEl = document.getElementById("opp-won-moves");
     if (oppWonTimeEl) oppWonTimeEl.textContent = formatTime(timeSpent);
     if (oppWonMovesEl) oppWonMovesEl.textContent = movesMade;
-    
+
     const oppWonModal = document.getElementById("opponent_won_modal");
     if (oppWonModal) oppWonModal.showModal();
   }
@@ -187,14 +214,15 @@ function handleOpponentDisconnect() {
       if (weSolved) {
         statusText.textContent = "Match finished. Ready to search again.";
       } else {
-        statusText.textContent = "Opponent disconnected. Finish your run to search again.";
+        statusText.textContent =
+          "Opponent disconnected. Finish your run to search again.";
       }
       statusText.classList.remove("text-rose-600");
     }
-    
+
     // Hide opponent moves stats since opponent left
     document.getElementById("stat-opponent-container")?.classList.add("hidden");
-    
+
     const replayBtn = document.getElementById("btn-victory-replay");
     if (replayBtn) {
       replayBtn.disabled = false;
@@ -209,17 +237,17 @@ function handleOpponentDisconnect() {
     statusText.textContent = "Opponent disconnected. Returning to Solo Mode.";
     statusText.classList.remove("text-rose-600");
   }
-  
+
   document.getElementById("stat-opponent-container")?.classList.add("hidden");
   document.getElementById("mp-room-badge")?.classList.add("hidden");
   document.getElementById("mp-panel-status")?.classList.add("hidden");
-  
+
   const newGameBtn = document.getElementById("new-game");
   if (newGameBtn) {
     newGameBtn.disabled = false;
     newGameBtn.classList.remove("btn-disabled");
   }
-  
+
   // Also unlock replay button if opponent disconnected
   const replayBtn = document.getElementById("btn-victory-replay");
   if (replayBtn) {
@@ -240,8 +268,12 @@ function handleStatusUpdate(status) {
   }
 
   const code = getRoomCode();
-  const active = isConnected() || !!code || status.includes("Searching") || status.includes("Handshaking");
-  
+  const active =
+    isConnected() ||
+    !!code ||
+    status.includes("Searching") ||
+    status.includes("Handshaking");
+
   const statusBadge = document.getElementById("mp-panel-status");
   if (statusBadge) {
     if (active) statusBadge.classList.remove("hidden");
@@ -315,7 +347,12 @@ async function handleVictory() {
   document.getElementById("victory-rank").textContent = rank;
 
   generateScorecard(getCurrentMap(), formatTime(finalTime), finalMoves, rank);
-  setupSocialShareLinks(getCurrentMap(), formatTime(finalTime), finalMoves, rank);
+  setupSocialShareLinks(
+    getCurrentMap(),
+    formatTime(finalTime),
+    finalMoves,
+    rank,
+  );
 
   renderGlobalLeaderboard();
 
@@ -353,7 +390,7 @@ function renderLocalLeaderboard() {
   if (!localBody) return;
   localBody.innerHTML = "";
 
-  const localHistory = JSON.parse(localStorage.getItem("geoHistory")) || [];
+  const localHistory = getLocalHistory();
   if (localHistory.length === 0) {
     localBody.innerHTML = `<tr><td colspan="4" class="py-4 text-center opacity-50 italic">No finishes yet! Log a run to begin.</td></tr>`;
     return;
@@ -399,7 +436,7 @@ function setupTabToggle(containerId, callback) {
 document.addEventListener("DOMContentLoaded", () => {
   setupProfile();
 
-  window.toggleMpPanel = function() {
+  window.toggleMpPanel = function () {
     const content = document.getElementById("mp-panel-content");
     const toggle = document.getElementById("mp-panel-toggle");
     if (!content || !toggle) return;
@@ -407,7 +444,7 @@ document.addEventListener("DOMContentLoaded", () => {
       content.classList.remove("hidden");
       toggle.textContent = "Collapse ▲";
       preConnectPeer(); // Warm up connection
-      
+
       // Start global online count polling on expand!
       if (!onlineCountIntervalId) {
         updateOnlineCount();
@@ -496,18 +533,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!countEl) return;
     try {
       const probeId = "probe-" + Math.random().toString(36).substring(2, 8);
-      const res = await fetch("https://peerbasket.bittu.dev/basket/geoshuffle-online?limit=1", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ peer_id: probeId })
-      });
+      const res = await fetch(
+        "https://peerbasket.bittu.dev/basket/geoshuffle-online?limit=1",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ peer_id: probeId }),
+        },
+      );
       if (!res.ok) throw new Error();
       const data = await res.json();
       countEl.textContent = `${data.total_peers} online`;
-      countEl.classList.remove("opacity-50");
+      countEl.classList.remove("opacity-50", "hidden");
     } catch (err) {
       countEl.textContent = "Online";
       countEl.classList.add("opacity-50");
+      countEl.classList.remove("hidden");
     }
   }
 
@@ -515,28 +556,28 @@ document.addEventListener("DOMContentLoaded", () => {
   if (victoryModalElement) {
     victoryModalElement.addEventListener("close", () => {
       weClickedPlayAgain = true;
-      
+
       if (isRandomMatch()) {
         // Quick Match: immediately search for a new game
         startQuickMatch();
       } else if (isConnected()) {
         // Private Lobby: both need to click Play Again before Host starts!
         sendOpponentReadyReplay();
-        
+
         if (opponentClickedPlayAgain) {
           if (getRole() === "host") {
             const earthData = getEarthData();
             const randomMapIdx = Math.floor(Math.random() * earthData.length);
+            const map = earthData[randomMapIdx];
             shuffleBoard(5, () => {
-              const map = earthData[randomMapIdx];
-              setCurrentMap(map);
               sendGameStart(randomMapIdx, getTiles());
               handleMatchStart(randomMapIdx, getTiles());
-            });
+            }, map);
           } else {
             resetTimer();
             document.getElementById("stat-time").textContent = "00:00";
-            document.getElementById("mp-status-text").textContent = "Requested replay. Starting game...";
+            document.getElementById("mp-status-text").textContent =
+              "Requested replay. Starting game...";
             requestNewGame();
           }
         } else {
@@ -544,9 +585,11 @@ document.addEventListener("DOMContentLoaded", () => {
           resetTimer();
           document.getElementById("stat-time").textContent = "00:00";
           if (getRole() === "host") {
-            document.getElementById("mp-status-text").textContent = "Ready to replay. Waiting for guest...";
+            document.getElementById("mp-status-text").textContent =
+              "Ready to replay. Waiting for guest...";
           } else {
-            document.getElementById("mp-status-text").textContent = "Ready to replay. Waiting for host...";
+            document.getElementById("mp-status-text").textContent =
+              "Ready to replay. Waiting for host...";
           }
         }
       } else {
@@ -585,14 +628,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (getRole() === "host") {
         const earthData = getEarthData();
         const randomMapIdx = Math.floor(Math.random() * earthData.length);
-        
+        const map = earthData[randomMapIdx];
+
         // Host shuffles board first, then shares with Guest
         shuffleBoard(5, () => {
-          const map = earthData[randomMapIdx];
-          setCurrentMap(map);
           sendGameStart(randomMapIdx, getTiles());
           handleMatchStart(randomMapIdx, getTiles());
-        });
+        }, map);
       }
     },
     onMatchStart: handleMatchStart,
@@ -603,15 +645,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (getRole() === "host" && weClickedPlayAgain) {
         const earthData = getEarthData();
         const randomMapIdx = Math.floor(Math.random() * earthData.length);
+        const map = earthData[randomMapIdx];
         shuffleBoard(5, () => {
-          const map = earthData[randomMapIdx];
-          setCurrentMap(map);
           sendGameStart(randomMapIdx, getTiles());
           handleMatchStart(randomMapIdx, getTiles());
-        });
+        }, map);
       }
     },
-    onOpponentReadyReplay: handleOpponentReadyReplay
+    onOpponentReadyReplay: handleOpponentReadyReplay,
   });
 
   // Bind Multiplayer Control Panel Buttons
@@ -632,7 +673,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("btn-cancel-mp")?.addEventListener("click", () => {
     cancelMultiplayer();
-    
+
     // Enable Manual Shuffle button
     const newGameBtn = document.getElementById("new-game");
     if (newGameBtn) {
@@ -661,13 +702,13 @@ document.addEventListener("DOMContentLoaded", () => {
           updateLocationPanel(getCurrentMap(), false);
         });
       }
-    }, 
+    },
     handleVictory,
     (moves) => {
       if (isConnected()) {
         sendMoveUpdate(moves);
       }
-    }
+    },
   );
 
   // Online count is initialized on multiplayer panel expansion

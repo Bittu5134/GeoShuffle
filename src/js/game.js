@@ -100,7 +100,7 @@ export function renderBoard(isGameWon = false) {
   });
 }
 
-export function shuffleBoard(count = 200, onShuffleComplete = null) {
+export function shuffleBoard(count = 200, onShuffleComplete = null, specificMap = null) {
   const board = document.getElementById("board");
   if (!board) return;
 
@@ -111,7 +111,11 @@ export function shuffleBoard(count = 200, onShuffleComplete = null) {
   renderBoard(false);
 
   const state = Flip.getState("#board > div");
-  currentMap = earthData[Math.floor(Math.random() * earthData.length)];
+  if (specificMap) {
+    currentMap = specificMap;
+  } else {
+    currentMap = earthData[Math.floor(Math.random() * earthData.length)];
+  }
   updateLocationPanel(currentMap, false);
 
   // Perform random sliding actions to shuffle
@@ -206,8 +210,28 @@ function handleTileClick(index) {
   const isVictory = tiles.every((val, i) => val === tilesEnd[i]);
   if (isVictory) {
     gameActive = false;
-    if (onVictoryCallback) {
-      onVictoryCallback();
+
+    const emptyTileEl = document.querySelector(".empty-tile");
+    if (emptyTileEl) {
+      emptyTileEl.classList.remove("pointer-events-none");
+      gsap.fromTo(
+        emptyTileEl,
+        { opacity: 0 },
+        {
+          opacity: 1,
+          duration: 0.8,
+          ease: "power2.out",
+          onComplete: () => {
+            if (onVictoryCallback) {
+              onVictoryCallback();
+            }
+          },
+        }
+      );
+    } else {
+      if (onVictoryCallback) {
+        onVictoryCallback();
+      }
     }
   }
 }

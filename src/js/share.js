@@ -1,16 +1,7 @@
 import { dataURLtoFile } from "./scorecard.js";
 
 export function copyToClipboardFallback(text) {
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.style.top = "0";
-  textarea.style.left = "0";
-  textarea.style.position = "fixed";
-  document.body.appendChild(textarea);
-  textarea.focus();
-  textarea.select();
-  try {
-    document.execCommand("copy");
+  const updateBtnVisual = () => {
     const btn = document.getElementById("btn-copy-share");
     if (btn) {
       const originalHtml = btn.innerHTML;
@@ -22,6 +13,33 @@ export function copyToClipboardFallback(text) {
         btn.innerHTML = originalHtml;
       }, 2000);
     }
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard
+      .writeText(text)
+      .then(updateBtnVisual)
+      .catch((err) => {
+        console.error("Clipboard API failed, using fallback:", err);
+        execCommandCopy(text, updateBtnVisual);
+      });
+  } else {
+    execCommandCopy(text, updateBtnVisual);
+  }
+}
+
+function execCommandCopy(text, onSuccess) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.style.top = "0";
+  textarea.style.left = "0";
+  textarea.style.position = "fixed";
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  try {
+    document.execCommand("copy");
+    if (onSuccess) onSuccess();
   } catch (err) {
     console.error("execCommand fallback failed:", err);
   }
@@ -47,7 +65,7 @@ export function setupSocialShareLinks(
   movesText,
   rankText,
 ) {
-  const { shareText, shareTextWithImg, shareUrl, locationName } =
+  const { shareText, shareTextWithImg, shareUrl, locationName, mapLink } =
     buildSharePayload(currentMap, timeText, movesText, rankText);
   const redditTitle = `I solved today's GeoShuffle satellite puzzle in ${timeText}!`;
 
@@ -58,7 +76,8 @@ export function setupSocialShareLinks(
 
   const shareReddit = document.getElementById("share-reddit");
   if (shareReddit) {
-    shareReddit.href = `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(redditTitle)}`;
+    const redditBody = `I solved today's GeoShuffle satellite puzzle for **${locationName}**!\n\n⏱️ **Time:** ${timeText}\n👣 **Moves:** ${movesText}\n🏆 **Global Rank:** ${rankText}\n\nPlay here: ${shareUrl}\n🗺️ Google Maps Location: ${mapLink}`;
+    shareReddit.href = `https://www.reddit.com/submit?title=${encodeURIComponent(redditTitle)}&text=${encodeURIComponent(redditBody)}`;
   }
 
   const shareFacebook = document.getElementById("share-facebook");
@@ -125,6 +144,10 @@ export async function triggerNativeShare(
       await navigator.share(shareData);
       return;
     } catch (err) {
+      if (err.name === "AbortError") {
+        console.log("Share cancelled by user.");
+        return;
+      }
       console.warn(
         "Native file sharing failed, trying text-only sharing:",
         err,
@@ -137,6 +160,7 @@ export async function triggerNativeShare(
         });
         return;
       } catch (fallbackErr) {
+        if (fallbackErr.name === "AbortError") return;
         console.error("Native text share failed:", fallbackErr);
       }
     }
