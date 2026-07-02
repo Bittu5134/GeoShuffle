@@ -104,7 +104,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.font = "900 14px Outfit, Fredoka, sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
-    ctx.fillText("LOCATION DETECTED", 40, 550);
+    ctx.fillText("LOCATION", 40, 550);
 
     ctx.fillStyle = "#173a31";
     ctx.font = "900 36px Outfit, Fredoka, sans-serif";
