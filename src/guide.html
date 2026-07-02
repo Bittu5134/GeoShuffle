@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en" data-theme="geoshuffle">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GeoShuffle - Game Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+
+  <body class="bg-base-100 text-base-content min-h-screen w-full">
+    <main class="w-full max-w-4xl mx-auto p-4 box-border">
+      <header
+        class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 mb-6 text-center sm:text-left"
+      >
+        <div>
+          <h1
+            class="text-4xl sm:text-5xl md:text-6xl font-black tracking-widest uppercase neo-brutal-title"
+          >
+            GeoShuffle
+          </h1>
+          <p
+            class="text-sm sm:text-xs font-bold opacity-80 tracking-widest mt-1.5 uppercase text-neutral whitespace-nowrap"
+          >
+            A guide for Zoro...
+          </p>
+        </div>
+        <a
+          href="./"
+          class="btn neo-btn neo-btn-outline px-4 py-2 font-bold text-xs sm:text-sm my-auto"
+        >
+          <svg class="size-5">
+            <use href="./assets/icons.svg#controller"></use>
+          </svg>
+          Play Game
+        </a>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <!-- How to Play Card -->
+        <article class="neo-card p-6 flex flex-col justify-between">
+          <div>
+            <h2
+              class="text-2xl font-black mb-3 border-b-2 border-neutral/10 pb-2"
+            >
+              <svg class="size-7 inline">
+                <use href="./assets/icons.svg#puzzle"></use>
+              </svg>
+              How to Play
+            </h2>
+            <p class="text-sm leading-relaxed mb-4">
+              GeoShuffle is a slide puzzle game. Your goal is to reconstruct
+              scrambled satellite images of famous locations and landmarks
+              around the Earth.
+            </p>
+            <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed mb-4">
+              <li>
+                Tap or click on any tile next to the empty space to slide it
+                into that space.
+              </li>
+              <li>
+                Rearrange the tiles until the satellite image looks correct.
+              </li>
+              <li>
+                Once you solve it, you will see details about the location and a
+                link to view it on Google Maps!
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Keyboard Controls Card -->
+        <article class="neo-card p-6 flex flex-col justify-between">
+          <div>
+            <h2
+              class="text-2xl font-black mb-3 border-b-2 border-neutral/10 pb-2"
+            >
+              <svg class="size-7 inline">
+                <use href="./assets/icons.svg#controller"></use>
+              </svg>
+              How to Move Tiles
+            </h2>
+            <p class="text-sm leading-relaxed mb-4">
+              You can slide tiles around using clicks, keyboard buttons, or
+              swipe gestures:
+            </p>
+            <div class="space-y-4">
+              <div>
+                <h3 class="font-bold text-xs uppercase opacity-75 mb-1.5">
+                  Keyboard Buttons
+                </h3>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div
+                    class="bg-base-200 border border-neutral/15 p-2 rounded-lg"
+                  >
+                    <kbd
+                      class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
+                      >W</kbd
+                    >
+                    or
+                    <kbd
+                      class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
+                      >↑</kbd
+                    >
+                    <span class="block mt-1 opacity-75">Slide tile up</span>
+                  </div>
+                  <div
+                    class="bg-base-200 border border-neutral/15 p-2 rounded-lg"
+                  >
+                    <kbd
+                      class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
+                      >S</kbd
+                    >
+                    or
+                    <kbd
+                      class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
+                      >↓</kbd
+                    >
+                    <span class="block mt-1 opacity-75">Slide tile down</span>
+                  </div>
+                  <div
+                    class="bg-base-200 border border-neutral/15 p-2 rounded-lg"
+                  >
+                    <kbd
+                      class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
+                      >A</kbd
+                    >
+                    or
+                    <kbd
+                      class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
+                      >←</kbd
+                    >
+                    <span class="block mt-1 opacity-75">Slide tile left</span>
+                  </div>
+                  <div
+                    class="bg-base-200 border border-neutral/15 p-2 rounded-lg"
+                  >
+                    <kbd
+                      class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
+                      >D</kbd
+                    >
+                    or
+                    <kbd
+                      class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
+                      >→</kbd
+                    >
+                    <span class="block mt-1 opacity-75">Slide tile right</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 class="font-bold text-xs uppercase opacity-75 mb-1">
+                  Mobile Swipes
+                </h3>
+                <p class="text-xs opacity-75 leading-relaxed">
+                  On mobile or tablet screens, simply swipe your finger across
+                  the puzzle grid in any direction to slide tiles into the gap.
+                </p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Profiles & Settings Card -->
+        <article class="neo-card p-6 flex flex-col justify-between">
+          <div>
+            <h2
+              class="text-2xl font-black mb-3 border-b-2 border-neutral/10 pb-2"
+            >
+              <svg class="size-7 inline">
+                <use href="./assets/icons.svg#profile"></use>
+              </svg>
+              How to Change Nickname
+            </h2>
+            <p class="text-sm leading-relaxed mb-4">
+              You can personalize your handle name and adjust helper layouts:
+            </p>
+            <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed">
+              <li>
+                <strong>First-time Load</strong>: On your first visit, a welcome
+                prompt will ask you to enter a nickname.
+              </li>
+              <li>
+                <strong>Change Name</strong>: Open Settings, click on the Player
+                Name field, type a nickname, and it will be saved.
+              </li>
+              <li>
+                <strong>Helper Numbers</strong>: Toggle "Number Assist" in
+                Settings to show helper numbers on tiles.
+              </li>
+              <li>
+                <strong>Grid Outline</strong>: Hidden and shown with the same
+                "Number Assist" toggle.
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Multiplayer Lobbies Card -->
+        <article class="neo-card p-6 flex flex-col justify-between">
+          <div>
+            <h2
+              class="text-2xl font-black mb-3 border-b-2 border-neutral/10 pb-2"
+            >
+              <svg class="size-7 inline">
+                <use href="./assets/icons.svg#multiplayer-badge"></use>
+              </svg>
+              How to Play with Friends
+            </h2>
+            <p class="text-sm leading-relaxed mb-4">
+              Compete head-to-head with other players in real-time:
+            </p>
+            <ul class="list-disc pl-5 space-y-2 text-sm leading-relaxed">
+              <li>
+                <strong>Host a Match</strong>: Click "Host Lobby", copy the
+                6-letter room code, and send it to your friend.
+              </li>
+              <li>
+                <strong>Join a Friend</strong>: Enter your friend's room code in
+                the input box and click "Join Lobby".
+              </li>
+              <li>
+                <strong>Quick Play</strong>: Click "Quick Match" to search for
+                and pair with any random player currently online.
+              </li>
+              <li>
+                <strong>Who Wins?</strong>: The first player to successfully
+                solve the map wins! You can see your opponent's move count live
+                at the top of your screen.
+              </li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- Leaderboards Card -->
+        <article class="neo-card p-6 md:col-span-2">
+          <h2
+            class="text-2xl font-black mb-3 border-b-2 border-neutral/10 pb-2"
+          >
+            <svg class="size-7 inline">
+              <use href="./assets/icons.svg#trophy"></use>
+            </svg>
+            Ranks & Scorecards
+          </h2>
+          <p class="text-sm leading-relaxed mb-4">
+            Track your progress and share your puzzle achievements:
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mt-2">
+            <div class="bg-base-200 border border-neutral/15 p-4 rounded-xl">
+              <h3 class="font-extrabold mb-1">Global Leaderboard</h3>
+              <p class="opacity-75 text-xs leading-relaxed">
+                When you solve a puzzle, your score is automatically sent to the
+                global leaderboard. Check the top ranks to see how fast you are
+                compared to players globally!
+              </p>
+            </div>
+            <div class="bg-base-200 border border-neutral/15 p-4 rounded-xl">
+              <h3 class="font-extrabold mb-1">Personal Runs</h3>
+              <p class="opacity-75 text-xs leading-relaxed">
+                Your last 100 solved runs are saved locally. Review your own
+                solve history, dates, times, and move counts in the Local
+                leaderboard tab.
+              </p>
+            </div>
+            <div class="bg-base-200 border border-neutral/15 p-4 rounded-xl">
+              <h3 class="font-extrabold mb-1">Download & Share</h3>
+              <p class="opacity-75 text-xs leading-relaxed">
+                Once solved, you can click "Download Scorecard" to save a
+                beautiful picture card of your completion, or click "Share
+                Score" to post it on social media.
+              </p>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <footer
+        class="mt-8 text-center text-xs opacity-50 border-t border-neutral/10 pt-4 pb-2"
+      >
+        GeoShuffle &copy; 2026. Made by
+        <a
+          href="https://bittu.dev"
+          target="_blank"
+          class="hover:underline font-bold"
+          >Bittu</a
+        >.
+      </footer>
+    </main>
+
+    <script type="module">
+      // Sync theme with localStorage
+      const savedTheme = localStorage.getItem("geoTheme") || "geoshuffle";
+      document.documentElement.setAttribute("data-theme", savedTheme);
+    </script>
+  </body>
+</html>

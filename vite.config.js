@@ -14,6 +14,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, "src/index.html"),
         leaderboard: resolve(__dirname, "src/leaderboard.html"),
+        guide: resolve(__dirname, "src/guide.html"),
       },
     },
   },
