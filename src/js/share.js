@@ -6,7 +6,7 @@ export function copyToClipboardFallback(text) {
     if (btn) {
       const originalHtml = btn.innerHTML;
       btn.innerHTML = `
-        <span class="text-lg">✅</span>
+        <svg class="size-4 text-emerald-600 mb-1"><use href="./assets/icons.svg#checkmark"></use></svg>
         <span class="text-[9px] uppercase opacity-75">Copied!</span>
       `;
       setTimeout(() => {
@@ -53,7 +53,7 @@ export function buildSharePayload(currentMap, timeText, movesText, rankText) {
   const shareUrl = "https://geoshuffle.bittu.dev";
   const mapLink = currentMap.map || "#";
 
-  const shareText = `I solved the GeoShuffle satellite puzzle for ${locationName} in ${timeText} with ${movesText} moves! Global Rank: ${rankText}. Can you beat me?\n\nPlay here: ${shareUrl}\n🗺️ Google Maps Location: ${mapLink}`;
+  const shareText = `I solved the GeoShuffle satellite puzzle for ${locationName} in ${timeText} with ${movesText} moves! Global Rank: ${rankText}. Can you beat me?\n\nPlay here: ${shareUrl}\nGoogle Maps Location: ${mapLink}`;
   const shareTextWithImg = `${shareText}\n\nSatellite View: ${currentMap.image}`;
 
   return { shareText, shareTextWithImg, shareUrl, locationName, mapLink };
@@ -76,7 +76,7 @@ export function setupSocialShareLinks(
 
   const shareReddit = document.getElementById("share-reddit");
   if (shareReddit) {
-    const redditBody = `I solved today's GeoShuffle satellite puzzle for **${locationName}**!\n\n⏱️ **Time:** ${timeText}\n👣 **Moves:** ${movesText}\n🏆 **Global Rank:** ${rankText}\n\nPlay here: ${shareUrl}\n🗺️ Google Maps Location: ${mapLink}`;
+    const redditBody = `I solved today's GeoShuffle satellite puzzle for **${locationName}**!\n\n**Time:** ${timeText}\n**Moves:** ${movesText}\n**Global Rank:** ${rankText}\n\nPlay here: ${shareUrl}\nGoogle Maps Location: ${mapLink}`;
     shareReddit.href = `https://www.reddit.com/submit?title=${encodeURIComponent(redditTitle)}&text=${encodeURIComponent(redditBody)}`;
   }
 

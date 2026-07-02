@@ -1,3 +1,5 @@
+import { gsap } from "gsap";
+
 let timerInterval = null;
 let timeElapsed = 0;
 
@@ -44,24 +46,39 @@ export function updateLocationPanel(currentMap, showFullDetails = false) {
     const locationName = [currentMap.region, currentMap.country]
       .filter(Boolean)
       .join(", ");
-    detailsEl.textContent = locationName || "Unknown Location";
+
+    const targetText = locationName || "Unknown Location";
+    if (detailsEl.textContent !== targetText) {
+      gsap.to(detailsEl, {
+        opacity: 0,
+        duration: 0.2,
+        onComplete: () => {
+          detailsEl.textContent = targetText;
+          gsap.to(detailsEl, {
+            opacity: 1,
+            duration: 0.4,
+            ease: "power2.out",
+          });
+        },
+      });
+    }
     linkEl.href = currentMap.map || "#";
-    linkEl.textContent = "🌐 View on Google Maps";
+    linkEl.innerHTML = `<svg class="size-5 inline mr-1"><use href="./assets/icons.svg#pin"></use></svg> View on Google Maps`;
     linkEl.className =
       "btn btn-success font-bold rounded-xl text-xs sm:text-sm shadow-md";
     linkEl.style.opacity = "1";
   } else {
     detailsEl.textContent = "Location is hidden!";
 
-    if (timeElapsed >= 60) {
+    if (timeElapsed >= 5) {
       linkEl.href = currentMap.map || "#";
-      linkEl.textContent = "📍 Open in Maps (Hint)";
+      linkEl.innerHTML = `<svg class="size-5 inline mr-1"><use href="./assets/icons.svg#pin"></use></svg> Open in Maps (Hint)`;
       linkEl.className =
         "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm shadow-md";
       linkEl.style.opacity = "1";
     } else {
       linkEl.href = "#";
-      linkEl.textContent = `🔒 Hint in ${60 - timeElapsed}s`;
+      linkEl.textContent = `Hint in ${5 - timeElapsed}s`;
       linkEl.className =
         "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm";
       linkEl.style.opacity = "0.5";
