@@ -65,7 +65,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
       .filter(Boolean)
       .join(", ");
 
-    const solvedLocText = "Solved Location";
+    const solvedLocText = "Location";
     const solvedLocX = Math.floor(w * 0.04);
     const solvedLocY = h - Math.floor(bannerHeight * 0.65);
     ctx.font = `${Math.floor(h * 0.03)}px Fredoka, sans-serif`;
@@ -84,7 +84,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
 
     ctx.textAlign = "right";
 
-    const statsText = `⏱️ ${timeText}  |  👣 ${movesText} moves  |  🏆 Rank ${rankText}`;
+    const statsText = `${timeText}  |  ${movesText} moves  |  Rank ${rankText}`;
     const statsX = w - Math.floor(w * 0.04);
     const statsY = h - Math.floor(bannerHeight * 0.35);
     ctx.font = `bold ${Math.floor(h * 0.042)}px Fredoka, sans-serif`;
