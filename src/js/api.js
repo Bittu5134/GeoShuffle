@@ -86,43 +86,51 @@ export async function getScoreRank(timeSpent) {
   }
 }
 
-export const defaultNames = [
-  "GeoWiz",
-  "MapLover",
-  "GlobeTrotter",
-  "AtlasExplorer",
-  "TerraSearcher",
-  "GridSlider",
-  "CompassClimber",
-  "GeoQuest",
-  "CartoCrafter",
-  "LatitudeLeaper",
-  "VectorVoyager",
-  "TopoTracker",
-  "MeridianMind",
-  "OrbitFinder",
-  "AzimuthAce",
-  "WaypointWanderer",
-  "BorderBounder",
-  "PixelPathfinder",
-  "LandmarkHunter",
-  "ScaleSeeker",
-  "DatumDrifter",
-  "GisGuru",
-  "LegendReader",
-  "TerrainTamer",
-  "EquatorEnthusiast",
-  "ZoneZenith",
-  "ApexAtlas",
-  "ChartChaser",
-  "SpheroidScout",
-  "PlotMaster",
-  "ContoursCruiser",
-  "GeoGenius",
-  "MapMatrix",
-  "VistaVoyage",
-  "GlobeGlider",
-  "HorizonHiker",
-  "CoordCommander",
-  "TerraTechie",
-];
+export function generateRandomUsername() {
+  const words1 = [
+    "Geo",
+    "Map",
+    "Trek",
+    "Grid",
+    "Peak",
+    "Mesa",
+    "Zone",
+    "Cape",
+    "Glax",
+    "Clay",
+    "Rock",
+    "Dune",
+    "Vale",
+  ];
+  const words2 = [
+    "Wiz",
+    "Ace",
+    "Neo",
+    "Spy",
+    "Pro",
+    "Max",
+    "Zen",
+    "Fox",
+    "Luv",
+    "Run",
+    "Fly",
+    "Guy",
+    "Pal",
+  ];
+
+  const w1 = words1[Math.floor(Math.random() * words1.length)];
+  const w2 = words2[Math.floor(Math.random() * words2.length)];
+  const num = Math.floor(100 + Math.random() * 900).toString();
+
+  const parts = [w1, w2, num];
+
+  // Shuffle parts array randomly (Fisher-Yates)
+  for (let i = parts.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = parts[i];
+    parts[i] = parts[j];
+    parts[j] = temp;
+  }
+
+  return parts.join("");
+}

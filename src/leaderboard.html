@@ -24,10 +24,13 @@
           GeoShuffle
         </h1>
         <a
-          href="./index.html"
-          class="btn neo-btn neo-btn-outline px-4 py-2 font-bold text-xs sm:text-sm"
+          href="./"
+          class="btn neo-btn neo-btn-outline px-4 py-2 font-bold text-xs sm:text-sm my-auto"
         >
-          🎮 Play Game
+          <svg class="size-5">
+            <use href="./assets/icons.svg#controller"></use>
+          </svg>
+          Play Game
         </a>
       </header>
 
@@ -38,7 +41,10 @@
             class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 border-b-2 border-neutral/10"
           >
             <h2 class="text-xl sm:text-2xl font-black tracking-wide">
-              🏆 Global (Top 100)
+              <svg class="size-7 inline">
+                <use href="./assets/icons.svg#stats"></use>
+              </svg>
+              Global (Top 100)
             </h2>
             <div id="full-tabs" class="join bg-base-300/30 p-0.5 rounded-xl">
               <button
@@ -78,7 +84,10 @@
             class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 border-b-2 border-neutral/10"
           >
             <h2 class="text-xl sm:text-2xl font-black tracking-wide">
-              🏠 Personal Bests
+              <svg class="size-7 inline">
+                <use href="./assets/icons.svg#stats"></use>
+              </svg>
+              Personal Bests
             </h2>
             <div id="local-tabs" class="join bg-base-300/30 p-0.5 rounded-xl">
               <button
@@ -112,6 +121,18 @@
           </div>
         </article>
       </div>
+
+      <footer
+        class="mt-8 text-center text-xs opacity-50 border-t border-neutral/10 pt-4 pb-2"
+      >
+        GeoShuffle &copy; 2026. Made by
+        <a
+          href="https://bittu.dev"
+          target="_blank"
+          class="hover:underline font-bold"
+          >Bittu</a
+        >.
+      </footer>
     </main>
 
     <script type="module" src="./js/leaderboard.js"></script>
