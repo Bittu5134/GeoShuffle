@@ -15,10 +15,8 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
   const loadingEl = document.getElementById("scorecard-loading");
   const downloadBtn = document.getElementById("btn-download-scorecard");
 
-  if (!previewImg || !loadingEl) return;
-
-  previewImg.classList.add("hidden");
-  loadingEl.classList.remove("hidden");
+  if (previewImg) previewImg.classList.add("hidden");
+  if (loadingEl) loadingEl.classList.remove("hidden");
 
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -34,29 +32,28 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
   }
 
   baseImg.onload = () => {
-    // Polaroid/Postcard dimensions: always high resolution (800 x 950)
+    // Postcard dimensions: high resolution (800 x 950)
     const w = 800;
     const h = 950;
     canvas.width = w;
     canvas.height = h;
 
-    // 1. Draw warm beige postcard background
+    // 1. App Base Background color (base-100 cream)
     ctx.fillStyle = "#fff9e6";
     ctx.fillRect(0, 0, w, h);
 
-    // 2. Draw thick outer neobrutalist border
+    // 2. Thick outer neutral border (hunter green)
     ctx.strokeStyle = "#173a31";
     ctx.lineWidth = 16;
     ctx.strokeRect(8, 8, w - 16, h - 16);
 
-    // 3. Draw cropped satellite image in the top half (object-fit: cover)
+    // 3. Cropped satellite image (object-fit: cover)
     const imgX = 40;
     const imgY = 40;
     const imageWidth = 720;
     const imageHeight = 480;
 
-    // Draw loading placeholder background
-    ctx.fillStyle = "#e2e8f0";
+    ctx.fillStyle = "#e8dfc7";
     ctx.fillRect(imgX, imgY, imageWidth, imageHeight);
 
     const iw = baseImg.naturalWidth || 800;
@@ -69,33 +66,36 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
 
     ctx.drawImage(baseImg, sx, sy, sWidth, sHeight, imgX, imgY, imageWidth, imageHeight);
 
-    // Draw border around the image
+    // Border around the image
     ctx.strokeStyle = "#173a31";
     ctx.lineWidth = 8;
     ctx.strokeRect(imgX, imgY, imageWidth, imageHeight);
 
-    // 4. Draw slanted "GEOSHUFFLE" badge/sticker in top-left
+    // 4. Large "GEOSHUFFLE" badge/sticker in top-left
     ctx.save();
-    ctx.translate(130, 80);
+    ctx.translate(160, 90);
     ctx.rotate(-0.08); // slight slant
+    
     // Badge shadow
     ctx.fillStyle = "#173a31";
-    ctx.fillRect(-70 + 4, -20 + 4, 140, 40);
-    // Badge background
-    ctx.fillStyle = "#facc15";
-    ctx.fillRect(-70, -20, 140, 40);
+    ctx.fillRect(-105 + 5, -25 + 5, 210, 50);
+    
+    // Badge background (warning yellow)
+    ctx.fillStyle = "#eab308";
+    ctx.fillRect(-105, -25, 210, 50);
     ctx.strokeStyle = "#173a31";
-    ctx.lineWidth = 4;
-    ctx.strokeRect(-70, -20, 140, 40);
-    // Badge text
+    ctx.lineWidth = 5;
+    ctx.strokeRect(-105, -25, 210, 50);
+    
+    // Badge text (larger size)
     ctx.fillStyle = "#173a31";
-    ctx.font = "900 16px Outfit, Fredoka, sans-serif";
+    ctx.font = "900 24px Outfit, Fredoka, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("GEOSHUFFLE", 0, 0);
     ctx.restore();
 
-    // 5. Draw Location Section
+    // 5. Location Section
     const locationName = [currentMap.region, currentMap.country]
       .filter(Boolean)
       .join(", ");
@@ -110,7 +110,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.font = "900 36px Outfit, Fredoka, sans-serif";
     ctx.fillText(locationName || "Unknown Location", 40, 575);
 
-    // 6. Draw Stats Cards Grid (3 columns: Time, Moves, Rank)
+    // 6. Stats Cards Grid matching the Victory Modal style (base-200 cards)
     const cardY = 660;
     const cardH = 110;
     const cardW = 220;
@@ -123,42 +123,42 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
       ctx.fillStyle = "#173a31";
       ctx.fillRect(x + 6, cardY + 6, cardW, cardH);
       
-      // Main Card background
-      ctx.fillStyle = "#ffffff";
+      // Card background (base-200 cream-beige)
+      ctx.fillStyle = "#e8dfc7";
       ctx.fillRect(x, cardY, cardW, cardH);
       ctx.strokeStyle = "#173a31";
       ctx.lineWidth = 5;
       ctx.strokeRect(x, cardY, cardW, cardH);
 
-      // Card Label with Emoji
-      ctx.fillStyle = "rgba(23, 58, 49, 0.6)";
+      // Card Label
+      ctx.fillStyle = "#173a31";
       ctx.font = "900 13px Outfit, Fredoka, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
       ctx.fillText(label, x + cardW / 2, cardY + 22);
 
-      // Card Value
+      // Card Value (matching modal text-emerald-700 / text-amber-600)
       ctx.fillStyle = accentColor;
       ctx.font = "900 32px Outfit, Fredoka, sans-serif";
       ctx.textBaseline = "middle";
       ctx.fillText(value, x + cardW / 2, cardY + 70);
     }
 
-    drawStatCard(40, "⏱️ TIME", timeText, "#10b981");
-    drawStatCard(40 + cardW + gap, "⚡ MOVES", String(movesText), "#f59e0b");
-    drawStatCard(40 + (cardW + gap) * 2, "🏆 RANK", rankVal, "#a855f7");
+    drawStatCard(40, "⏱️ TIME", timeText, "#047857");
+    drawStatCard(40 + cardW + gap, "⚡ MOVES", String(movesText), "#047857");
+    drawStatCard(40 + (cardW + gap) * 2, "🏆 RANK", rankVal, "#b45309");
 
-    // 7. Draw Domain Watermark on the bottom left
-    ctx.fillStyle = "rgba(23, 58, 49, 0.4)";
-    ctx.font = "800 14px Outfit, Fredoka, sans-serif";
+    // 7. Larger Watermark Domain Name at bottom left
+    ctx.fillStyle = "#173a31";
+    ctx.font = "900 20px Outfit, Fredoka, sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
     ctx.fillText("geoshuffle.bittu.dev", 40, 890);
 
-    // 8. Draw Passport Stamp on the bottom right (coral red)
+    // 8. Passport Stamp on the bottom right (coral red)
     ctx.save();
     ctx.translate(700, 860);
-    ctx.rotate(0.18); // slight stamp rotation
+    ctx.rotate(0.18);
     ctx.strokeStyle = "#ef4444";
     ctx.lineWidth = 3;
     
@@ -184,21 +184,28 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
 
     try {
       const dataUrl = canvas.toDataURL("image/png");
-      previewImg.src = dataUrl;
-      previewImg.classList.remove("hidden");
-      loadingEl.classList.add("hidden");
-
+      if (previewImg) {
+        previewImg.src = dataUrl;
+        previewImg.classList.remove("hidden");
+      }
+      if (loadingEl) {
+        loadingEl.classList.add("hidden");
+      }
       if (downloadBtn) {
         downloadBtn.href = dataUrl;
       }
     } catch (e) {
       console.error("Canvas export failed:", e);
-      loadingEl.classList.add("hidden");
+      if (loadingEl) {
+        loadingEl.classList.add("hidden");
+      }
     }
   };
 
   baseImg.onerror = () => {
     console.error("Failed to load base image for canvas scorecard.");
-    loadingEl.classList.add("hidden");
+    if (loadingEl) {
+      loadingEl.classList.add("hidden");
+    }
   };
 }
