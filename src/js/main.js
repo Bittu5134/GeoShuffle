@@ -1,7 +1,7 @@
 import {
   getPlayerName,
   setPlayerName,
-  defaultNames,
+  generateRandomUsername,
   addLocalHistoryRun,
   submitScore,
   getScoreRank,
@@ -58,12 +58,12 @@ let opponentSolved = false;
 let weSolved = false;
 let weClickedPlayAgain = false;
 let opponentClickedPlayAgain = false;
+let playAgainClicked = false;
 let onlineCountIntervalId = null;
 
 function setupProfile() {
   if (!localStorage.getItem("geoPlayerName")) {
-    const randomNum = Math.floor(100 + Math.random() * 900);
-    const randomPlaceholder = `${defaultNames[Math.floor(Math.random() * defaultNames.length)]}${randomNum}`;
+    const randomPlaceholder = generateRandomUsername();
     playerName = setPlayerName(randomPlaceholder);
 
     const modal = document.getElementById("name_prompt_modal");
@@ -117,7 +117,7 @@ function handleMatchStart(mapIndex, tiles) {
   if (replayBtn) {
     replayBtn.disabled = false;
     replayBtn.classList.remove("btn-disabled");
-    replayBtn.textContent = "🎮 Play Again";
+    replayBtn.textContent = "Play Again";
   }
 
   const earthData = getEarthData();
@@ -129,6 +129,8 @@ function handleMatchStart(mapIndex, tiles) {
 
   document.getElementById("stat-moves").textContent = "0";
   document.getElementById("stat-opponent-moves").textContent = "0";
+  document.getElementById("mp-status-text").textContent =
+    "Match started! Solve the board!";
 
   setGameActive(true);
 
@@ -148,24 +150,37 @@ function handleMatchStart(mapIndex, tiles) {
 function handleOpponentReadyReplay() {
   opponentClickedPlayAgain = true;
 
+  const statusText = document.getElementById("mp-status-text");
+  if (statusText) {
+    if (getRole() === "host") {
+      statusText.textContent = "Guest ready. Click Play Again to start.";
+    } else {
+      statusText.textContent = "Host ready. Click Play Again to accept.";
+    }
+  }
+
   if (!isRandomMatch()) {
     if (weClickedPlayAgain) {
       if (getRole() === "host") {
         const earthData = getEarthData();
         const randomMapIdx = Math.floor(Math.random() * earthData.length);
-        shuffleBoard(5, () => {
-          const map = earthData[randomMapIdx];
-          setCurrentMap(map);
-          sendGameStart(randomMapIdx, getTiles());
-          handleMatchStart(randomMapIdx, getTiles());
-        });
+        shuffleBoard(
+          5,
+          () => {
+            const map = earthData[randomMapIdx];
+            setCurrentMap(map);
+            sendGameStart(randomMapIdx, getTiles());
+            handleMatchStart(randomMapIdx, getTiles());
+          },
+          map,
+        );
       } else {
         requestNewGame();
       }
     } else {
       const replayBtn = document.getElementById("btn-victory-replay");
       if (replayBtn) {
-        replayBtn.textContent = "🎮 Play Again (Opponent Ready)";
+        replayBtn.textContent = "Play Again (Opponent Ready)";
       }
     }
   }
@@ -180,7 +195,7 @@ function handleOpponentVictory(timeSpent, movesMade) {
   opponentSolved = true;
   const statusText = document.getElementById("mp-status-text");
   if (statusText) {
-    statusText.textContent = `Opponent solved the puzzle in ${formatTime(timeSpent)} (${movesMade} moves)! Keep going to finish!`;
+    statusText.textContent = `Opponent solved in ${formatTime(timeSpent)} (${movesMade} moves). Keep solving!`;
     statusText.classList.add("text-rose-600");
   }
 
@@ -201,7 +216,7 @@ function handleOpponentVictory(timeSpent, movesMade) {
     if (replayBtn) {
       replayBtn.disabled = false;
       replayBtn.classList.remove("btn-disabled");
-      replayBtn.textContent = "🎮 Play Again";
+      replayBtn.textContent = "Play Again";
     }
   }
 }
@@ -212,10 +227,10 @@ function handleOpponentDisconnect() {
     const statusText = document.getElementById("mp-status-text");
     if (statusText) {
       if (weSolved) {
-        statusText.textContent = "Match finished. Ready to search again.";
+        statusText.textContent = "Opponent left. Rematch search ready.";
       } else {
         statusText.textContent =
-          "Opponent disconnected. Finish your run to search again.";
+          "Opponent disconnected. You can finish solving this board or start a new search.";
       }
       statusText.classList.remove("text-rose-600");
     }
@@ -227,7 +242,7 @@ function handleOpponentDisconnect() {
     if (replayBtn) {
       replayBtn.disabled = false;
       replayBtn.classList.remove("btn-disabled");
-      replayBtn.textContent = "🎮 Play Again";
+      replayBtn.textContent = "Play Again";
     }
     return;
   }
@@ -253,7 +268,7 @@ function handleOpponentDisconnect() {
   if (replayBtn) {
     replayBtn.disabled = false;
     replayBtn.classList.remove("btn-disabled");
-    replayBtn.textContent = "🎮 Play Again";
+    replayBtn.textContent = "Play Again";
   }
 
   const disconnectBtn = document.getElementById("btn-cancel-mp");
@@ -311,6 +326,7 @@ async function handleVictory() {
   const dateStr = new Date().toLocaleDateString();
 
   weSolved = true;
+  playAgainClicked = false;
 
   if (isConnected()) {
     sendVictory(finalTime, finalMoves);
@@ -323,6 +339,34 @@ async function handleVictory() {
   document.getElementById("victory-moves").textContent = finalMoves;
   document.getElementById("victory-rank").textContent = "#--";
 
+  const puns = [
+    "The equator called. It has no comment.",
+    "Somewhere, a mountain just felt slightly disrespected.",
+    "Tectonic plates shifted 2cm during that round. Unrelated, probably.",
+    "A river changed course out of sheer boredom.",
+    "Google Maps is taking notes.",
+    "This message was brought to you by the letter N, for North.",
+    "A cartographer somewhere just sighed.",
+    "Fun fact: none of that was on the test.",
+    "The Earth is still round, for now.",
+    "This round has been added to the historical record. Probably.",
+    "A GPS satellite blinked in confusion.",
+    "This has been a public geography moment.",
+    "No continents were harmed in the making of this round.",
+    "The Pacific Ocean remains unimpressed.",
+    "A globe spun somewhere, just because.",
+    "Compasses everywhere pointed vaguely in your direction.",
+    "That's on brand for planet Earth, honestly.",
+    "An unnamed island is jealous of the attention.",
+    "Latitude and longitude have entered the chat.",
+    "This has been today's rotation of the Earth. Thanks for riding along.",
+  ];
+  const randomPun = puns[Math.floor(Math.random() * puns.length)];
+  const subtitleEl = document.getElementById("victory-subtitle");
+  if (subtitleEl) {
+    subtitleEl.textContent = randomPun;
+  }
+
   renderBoard(true);
   updateLocationPanel(getCurrentMap(), true);
 
@@ -333,11 +377,11 @@ async function handleVictory() {
       if (!opponentSolved) {
         replayBtn.disabled = true;
         replayBtn.classList.add("btn-disabled");
-        replayBtn.textContent = "🔒 Waiting for Opponent...";
+        replayBtn.textContent = "Waiting for Opponent...";
       } else {
         replayBtn.disabled = false;
         replayBtn.classList.remove("btn-disabled");
-        replayBtn.textContent = "🎮 Play Again";
+        replayBtn.textContent = "Play Again";
       }
     }
   }
@@ -357,7 +401,12 @@ async function handleVictory() {
   renderGlobalLeaderboard();
 
   const victoryModal = document.getElementById("victory_modal");
-  if (victoryModal) victoryModal.showModal();
+  if (victoryModal) {
+    victoryModal.showModal();
+    setTimeout(() => {
+      document.getElementById("btn-victory-replay")?.focus();
+    }, 50);
+  }
 }
 
 async function renderGlobalLeaderboard() {
@@ -554,53 +603,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const victoryModalElement = document.getElementById("victory_modal");
   if (victoryModalElement) {
+    document
+      .getElementById("btn-victory-replay")
+      ?.addEventListener("click", () => {
+        playAgainClicked = true;
+      });
+
     victoryModalElement.addEventListener("close", () => {
-      weClickedPlayAgain = true;
+      if (playAgainClicked) {
+        weClickedPlayAgain = true;
 
-      if (isRandomMatch()) {
-        // Quick Match: immediately search for a new game
-        startQuickMatch();
-      } else if (isConnected()) {
-        // Private Lobby: both need to click Play Again before Host starts!
-        sendOpponentReadyReplay();
+        if (isRandomMatch()) {
+          // Quick Match: immediately search for a new game
+          startQuickMatch();
+        } else if (isConnected()) {
+          // Private Lobby: both need to click Play Again before Host starts!
+          sendOpponentReadyReplay();
 
-        if (opponentClickedPlayAgain) {
-          if (getRole() === "host") {
-            const earthData = getEarthData();
-            const randomMapIdx = Math.floor(Math.random() * earthData.length);
-            const map = earthData[randomMapIdx];
-            shuffleBoard(
-              5,
-              () => {
-                sendGameStart(randomMapIdx, getTiles());
-                handleMatchStart(randomMapIdx, getTiles());
-              },
-              map,
-            );
+          if (opponentClickedPlayAgain) {
+            if (getRole() === "host") {
+              const earthData = getEarthData();
+              const randomMapIdx = Math.floor(Math.random() * earthData.length);
+              const map = earthData[randomMapIdx];
+              shuffleBoard(
+                5,
+                () => {
+                  sendGameStart(randomMapIdx, getTiles());
+                  handleMatchStart(randomMapIdx, getTiles());
+                },
+                map,
+              );
+            } else {
+              resetTimer();
+              document.getElementById("stat-time").textContent = "00:00";
+              document.getElementById("mp-status-text").textContent =
+                "Replay requested. Starting soon...";
+              requestNewGame();
+            }
           } else {
+            // Waiting for opponent
             resetTimer();
             document.getElementById("stat-time").textContent = "00:00";
-            document.getElementById("mp-status-text").textContent =
-              "Requested replay. Starting game...";
-            requestNewGame();
+            if (getRole() === "host") {
+              document.getElementById("mp-status-text").textContent =
+                "Replay ready. Waiting for guest...";
+            } else {
+              document.getElementById("mp-status-text").textContent =
+                "Replay ready. Waiting for host...";
+            }
           }
         } else {
-          // Waiting for opponent
+          // Solo mode - play again
           resetTimer();
           document.getElementById("stat-time").textContent = "00:00";
-          if (getRole() === "host") {
-            document.getElementById("mp-status-text").textContent =
-              "Ready to replay. Waiting for guest...";
-          } else {
-            document.getElementById("mp-status-text").textContent =
-              "Ready to replay. Waiting for host...";
-          }
+          shuffleBoard(5);
         }
       } else {
-        // Solo mode
+        // Exited victory modal without choosing Play Again (clicked Close or closed window)
         resetTimer();
         document.getElementById("stat-time").textContent = "00:00";
-        shuffleBoard(5);
+        if (isConnected() || isRandomMatch()) {
+          // Disconnect from multiplayer game if exited without choosing play again
+          cancelMultiplayer();
+        }
       }
     });
     victoryModalElement.addEventListener("click", (e) => {
@@ -669,16 +734,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Bind Multiplayer Control Panel Buttons
   document.getElementById("btn-quick-match")?.addEventListener("click", () => {
+    setGameActive(false);
+    stopTimer();
     startQuickMatch();
   });
 
   document.getElementById("btn-host-lobby")?.addEventListener("click", () => {
+    setGameActive(false);
+    stopTimer();
     hostGame();
   });
 
   document.getElementById("btn-join-lobby")?.addEventListener("click", () => {
     const codeInput = document.getElementById("mp-join-input");
     if (codeInput && codeInput.value.trim()) {
+      setGameActive(false);
+      stopTimer();
       joinGame(codeInput.value.trim());
     }
   });
@@ -702,6 +773,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-opp-won-new")?.addEventListener("click", () => {
     const oppWonModal = document.getElementById("opponent_won_modal");
     if (oppWonModal) oppWonModal.close();
+    setGameActive(false);
+    stopTimer();
     startQuickMatch();
   });
 

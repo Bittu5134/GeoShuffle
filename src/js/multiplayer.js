@@ -96,7 +96,7 @@ export function cancelMultiplayer() {
   }
 
   matchmakingPeersSeen.clear();
-  callbacks.onStatusUpdate("Solo Mode active.");
+  callbacks.onStatusUpdate("Solo mode active.");
 }
 
 export function disconnectOpponent() {
@@ -126,7 +126,7 @@ export function disconnectOpponent() {
 export async function preConnectPeer() {
   try {
     await ensurePeerInitialized();
-    callbacks.onStatusUpdate("Ready to connect.");
+    callbacks.onStatusUpdate("Multiplayer engine ready.");
   } catch (err) {
     console.error("Pre-connect failed:", err);
   }
@@ -152,7 +152,7 @@ function ensurePeerInitialized() {
       return;
     }
 
-    callbacks.onStatusUpdate("Initializing connection engine...");
+    callbacks.onStatusUpdate("Initializing network...");
     peer = new window.Peer(null, {
       debug: 1, // Print only errors
     });
@@ -168,7 +168,7 @@ function ensurePeerInitialized() {
 
     peer.on("error", (err) => {
       console.error("PeerJS error:", err);
-      callbacks.onStatusUpdate("Connection error: " + err.type);
+      callbacks.onStatusUpdate("Network error: " + err.type);
       reject(err);
     });
 
@@ -209,7 +209,9 @@ export async function hostGame() {
 
   try {
     const myId = await ensurePeerInitialized();
-    callbacks.onStatusUpdate(`Room created: ${code}. Waiting for opponent...`);
+    callbacks.onStatusUpdate(
+      `Lobby created: [${code}]. Waiting for opponent...`,
+    );
 
     // Poll PeerBasket to register/keep-alive
     await postToBasket(basketId, myId);
@@ -218,7 +220,7 @@ export async function hostGame() {
     }, 12000);
   } catch (err) {
     console.error("Failed to host game:", err);
-    callbacks.onStatusUpdate("Hosting failed.");
+    callbacks.onStatusUpdate("Lobby creation failed.");
   }
 }
 
@@ -231,19 +233,19 @@ export async function joinGame(code) {
 
   try {
     const myId = await ensurePeerInitialized();
-    callbacks.onStatusUpdate("Entering room basket...");
+    callbacks.onStatusUpdate("Locating lobby...");
 
     // Retrieve peers in room
     const peers = await postToBasket(basketId, myId);
     const hostId = peers.find((id) => id !== myId);
 
     if (!hostId) {
-      callbacks.onStatusUpdate("Room code not found or empty.");
+      callbacks.onStatusUpdate("Lobby not found. Check code.");
       cancelMultiplayer();
       return;
     }
 
-    callbacks.onStatusUpdate("Connecting directly to host...");
+    callbacks.onStatusUpdate("Handshaking with host...");
     connectToPeer(hostId);
   } catch (err) {
     console.error("Failed to join game:", err);
@@ -255,7 +257,7 @@ export async function joinGame(code) {
 export async function startQuickMatch() {
   disconnectOpponent();
   isMatchmaking = true;
-  callbacks.onStatusUpdate("Searching for an opponent...");
+  callbacks.onStatusUpdate("Searching for opponent...");
 
   try {
     const myId = await ensurePeerInitialized();
@@ -279,7 +281,7 @@ async function performMatchmakingTick(myId) {
 
   const seekers = peers.filter((id) => id !== myId);
   if (seekers.length === 0) {
-    callbacks.onStatusUpdate("Searching for an opponent... (Queue empty)");
+    callbacks.onStatusUpdate("Queue empty. Searching...");
     return;
   }
 
@@ -314,7 +316,7 @@ function connectToPeer(targetId, matchmakingMode = false) {
       conn.close();
       conn = null;
       if (matchmakingMode) {
-        callbacks.onStatusUpdate("Handshake timed out. Resuming search...");
+        callbacks.onStatusUpdate("Handshake timed out. Searching again...");
       } else {
         callbacks.onStatusUpdate("Connection timed out.");
         cancelMultiplayer();
@@ -330,11 +332,11 @@ function connectToPeer(targetId, matchmakingMode = false) {
     console.log("Data connection opened with:", targetId);
     startP2PHeartbeat();
     if (matchmakingMode) {
-      callbacks.onStatusUpdate("Opponent found! Negotiating match...");
+      callbacks.onStatusUpdate("Negotiating match...");
       conn.send({ type: "match_request", senderId: peer.id });
     } else {
       // In private joining, connection open means connected
-      callbacks.onStatusUpdate("Connected!");
+      callbacks.onStatusUpdate("Connected. Starting soon...");
       if (heartbeatInterval) {
         clearInterval(heartbeatInterval);
         heartbeatInterval = null;
@@ -372,7 +374,7 @@ function handleIncomingConnection(incomingConn) {
     console.log("Incoming connection opened from:", conn.peer);
     startP2PHeartbeat();
     if (!isMatchmaking) {
-      callbacks.onStatusUpdate("Connected!");
+      callbacks.onStatusUpdate("Connected. Starting soon...");
       if (heartbeatInterval) {
         clearInterval(heartbeatInterval);
         heartbeatInterval = null;
@@ -416,7 +418,7 @@ function handleData(data) {
         }
 
         conn.send({ type: "match_accept", roomCode });
-        callbacks.onStatusUpdate("Connected! Ready to play.");
+        callbacks.onStatusUpdate("Opponent ready. Starting...");
         callbacks.onConnectionEstablished();
       }
       break;
@@ -433,9 +435,7 @@ function handleData(data) {
           heartbeatInterval = null;
         }
 
-        callbacks.onStatusUpdate(
-          "Connected! Waiting for host to select map...",
-        );
+        callbacks.onStatusUpdate("Connected. Waiting for host...");
         callbacks.onConnectionEstablished();
       }
       break;

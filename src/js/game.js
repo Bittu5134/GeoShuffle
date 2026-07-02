@@ -81,7 +81,7 @@ export function renderBoard(isGameWon = false) {
     const [origCol, origRow] = indexToPos(value - 1);
     tile.style.backgroundPosition = `${origCol * 20}% ${origRow * 33.3333}%`;
 
-    const currentGridOpacity = numberAssist ? gridOpacity : 0;
+    const currentGridOpacity = !isGameWon && numberAssist ? gridOpacity : 0;
     tile.style.outline = `1px solid rgba(23, 58, 49, ${currentGridOpacity})`;
 
     if (value === 24) {
@@ -215,6 +215,24 @@ function handleTileClick(index) {
   if (isVictory) {
     gameActive = false;
 
+    const numbers = document.querySelectorAll(".tile-number");
+    if (numbers.length > 0) {
+      gsap.to(numbers, {
+        opacity: 0,
+        duration: 0.5,
+        ease: "power2.out",
+      });
+    }
+
+    const tilesEl = document.querySelectorAll(".boardTileIndex");
+    if (tilesEl.length > 0) {
+      gsap.to(tilesEl, {
+        outlineColor: "rgba(23, 58, 49, 0)",
+        duration: 0.5,
+        ease: "power2.out",
+      });
+    }
+
     const emptyTileEl = document.querySelector(".empty-tile");
     if (emptyTileEl) {
       emptyTileEl.classList.remove("pointer-events-none");
@@ -238,4 +256,133 @@ function handleTileClick(index) {
       }
     }
   }
+}
+
+document.addEventListener("keydown", (e) => {
+  if (!gameActive) return;
+
+  const activeEl = document.activeElement;
+  if (
+    activeEl &&
+    (activeEl.tagName === "INPUT" ||
+      activeEl.tagName === "TEXTAREA" ||
+      activeEl.isContentEditable)
+  ) {
+    return;
+  }
+
+  if (
+    ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.key)
+  ) {
+    e.preventDefault();
+  }
+
+  const emptyIndex = tiles.indexOf(24);
+  const [emptyCol, emptyRow] = indexToPos(emptyIndex);
+  let targetIndex = -1;
+
+  switch (e.key.toLowerCase()) {
+    case "arrowup":
+    case "w":
+      if (emptyRow < ROWS - 1) {
+        targetIndex = emptyIndex + COLS;
+      }
+      break;
+    case "arrowdown":
+    case "s":
+      if (emptyRow > 0) {
+        targetIndex = emptyIndex - COLS;
+      }
+      break;
+    case "arrowleft":
+    case "a":
+      if (emptyCol < COLS - 1) {
+        targetIndex = emptyIndex + 1;
+      }
+      break;
+    case "arrowright":
+    case "d":
+      if (emptyCol > 0) {
+        targetIndex = emptyIndex - 1;
+      }
+      break;
+  }
+
+  if (targetIndex !== -1) {
+    handleTileClick(targetIndex);
+  }
+});
+
+function setupSwipeDetection() {
+  const boardEl = document.getElementById("board");
+  if (!boardEl) return;
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  boardEl.addEventListener(
+    "touchstart",
+    (e) => {
+      if (!gameActive) return;
+      touchStartX = e.changedTouches[0].clientX;
+      touchStartY = e.changedTouches[0].clientY;
+    },
+    { passive: true },
+  );
+
+  boardEl.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!gameActive) return;
+      e.preventDefault();
+    },
+    { passive: false },
+  );
+
+  boardEl.addEventListener(
+    "touchend",
+    (e) => {
+      if (!gameActive) return;
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+
+      const threshold = 30;
+
+      if (Math.abs(diffX) < threshold && Math.abs(diffY) < threshold) {
+        return;
+      }
+
+      const emptyIndex = tiles.indexOf(24);
+      const [emptyCol, emptyRow] = indexToPos(emptyIndex);
+      let targetIndex = -1;
+
+      if (Math.abs(diffX) > Math.abs(diffY)) {
+        if (diffX > 0) {
+          if (emptyCol > 0) targetIndex = emptyIndex - 1;
+        } else {
+          if (emptyCol < COLS - 1) targetIndex = emptyIndex + 1;
+        }
+      } else {
+        if (diffY > 0) {
+          if (emptyRow > 0) targetIndex = emptyIndex - COLS;
+        } else {
+          if (emptyRow < ROWS - 1) targetIndex = emptyIndex + COLS;
+        }
+      }
+
+      if (targetIndex !== -1) {
+        handleTileClick(targetIndex);
+      }
+    },
+    { passive: true },
+  );
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", setupSwipeDetection);
+} else {
+  setupSwipeDetection();
 }
