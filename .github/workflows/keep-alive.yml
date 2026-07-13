@@ -1,0 +1,35 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Runs every 3 hours
+    - cron: '0 */3 * * *'
+  workflow_dispatch: # Allows manual trigger from the Actions tab
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send random keep-alive requests
+        run: |
+          API_KEY="${{ secrets.SUPABASE_ANON_KEY }}"
+          if [ -z "$API_KEY" ]; then
+            API_KEY="sb_publishable_uRHRP8GLVvPE1WCJ1UoWkw_Cwqm_Vn6"
+          fi
+
+          NUM_REQUESTS=$(( RANDOM % 4 ))
+          echo "Number of requests to send: $NUM_REQUESTS"
+
+          for (( i=1; i<=NUM_REQUESTS; i++ ))
+          do
+            echo "Sending request $i of $NUM_REQUESTS..."
+            curl -s -o /dev/null -w "HTTP Status: %{http_code}\n" -X GET "https://rmkplarqcrktdjpkegyu.supabase.co/rest/v1/leaderboard?limit=1" \
+              -H "apikey: $API_KEY" \
+              -H "Authorization: Bearer $API_KEY"
+
+            if [ $i -lt $NUM_REQUESTS ]; then
+              SLEEP_TIME=$(( 2 + RANDOM % 8 ))
+              echo "Sleeping for $SLEEP_TIME seconds..."
+              sleep $SLEEP_TIME
+            fi
+          done
