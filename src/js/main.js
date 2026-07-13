@@ -21,6 +21,7 @@ import {
   setTiles,
   setCurrentMap,
   getEarthData,
+  SHUFFLE_STEPS,
 } from "./game.js";
 import {
   startTimer,
@@ -165,7 +166,7 @@ function handleOpponentReadyReplay() {
         const earthData = getEarthData();
         const randomMapIdx = Math.floor(Math.random() * earthData.length);
         shuffleBoard(
-          5,
+          SHUFFLE_STEPS,
           () => {
             const map = earthData[randomMapIdx];
             setCurrentMap(map);
@@ -466,7 +467,6 @@ function renderLocalLeaderboard() {
   });
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
   setupProfile();
 
@@ -549,7 +549,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("new-game")?.addEventListener("click", () => {
     resetTimer();
     document.getElementById("stat-time").textContent = "00:00";
-    shuffleBoard(5);
+    shuffleBoard(SHUFFLE_STEPS);
   });
 
   const locationLink = document.getElementById("location-link");
@@ -611,7 +611,7 @@ document.addEventListener("DOMContentLoaded", () => {
               const randomMapIdx = Math.floor(Math.random() * earthData.length);
               const map = earthData[randomMapIdx];
               shuffleBoard(
-                5,
+                SHUFFLE_STEPS,
                 () => {
                   sendGameStart(randomMapIdx, getTiles());
                   handleMatchStart(randomMapIdx, getTiles());
@@ -641,7 +641,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Solo mode - play again
           resetTimer();
           document.getElementById("stat-time").textContent = "00:00";
-          shuffleBoard(5);
+          shuffleBoard(SHUFFLE_STEPS);
         }
       } else {
         // Exited victory modal without choosing Play Again (clicked Close or closed window)
@@ -686,7 +686,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Host shuffles board first, then shares with Guest
         shuffleBoard(
-          5,
+          SHUFFLE_STEPS,
           () => {
             sendGameStart(randomMapIdx, getTiles());
             handleMatchStart(randomMapIdx, getTiles());
@@ -705,7 +705,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const randomMapIdx = Math.floor(Math.random() * earthData.length);
         const map = earthData[randomMapIdx];
         shuffleBoard(
-          5,
+          SHUFFLE_STEPS,
           () => {
             sendGameStart(randomMapIdx, getTiles());
             handleMatchStart(randomMapIdx, getTiles());
@@ -784,7 +784,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Online count is initialized on multiplayer panel expansion
 
   setGameActive(false);
-  shuffleBoard(5);
+  shuffleBoard(SHUFFLE_STEPS);
   renderGlobalLeaderboard();
   renderLocalLeaderboard();
 });

@@ -65,8 +65,6 @@ function renderLocalLeaderboard() {
   });
 }
 
-
-
 document.addEventListener("DOMContentLoaded", () => {
   const savedTheme = localStorage.getItem("geoTheme") || "geoshuffle";
   document.documentElement.setAttribute("data-theme", savedTheme);

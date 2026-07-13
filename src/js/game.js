@@ -7,6 +7,7 @@ gsap.registerPlugin(Flip);
 
 export const COLS = 6;
 export const ROWS = 4;
+export const SHUFFLE_STEPS = 200;
 
 let tiles = [...Array(24).keys()].map((i) => i + 1);
 const tilesEnd = [...tiles];
@@ -101,7 +102,7 @@ export function renderBoard(isGameWon = false) {
 }
 
 export function shuffleBoard(
-  count = 200,
+  count = SHUFFLE_STEPS,
   onShuffleComplete = null,
   specificMap = null,
 ) {

@@ -1,5 +1,7 @@
 import { gsap } from "gsap";
 
+export const HINT_DELAY_SECONDS = 45;
+
 let timerInterval = null;
 let timeElapsed = 0;
 
@@ -70,7 +72,7 @@ export function updateLocationPanel(currentMap, showFullDetails = false) {
   } else {
     detailsEl.textContent = "Location is hidden!";
 
-    if (timeElapsed >= 5) {
+    if (timeElapsed >= HINT_DELAY_SECONDS) {
       linkEl.href = currentMap.map || "#";
       linkEl.innerHTML = `<svg class="size-5 inline mr-1"><use href="./assets/icons.svg#pin"></use></svg> Open in Maps (Hint)`;
       linkEl.className =
@@ -78,7 +80,7 @@ export function updateLocationPanel(currentMap, showFullDetails = false) {
       linkEl.style.opacity = "1";
     } else {
       linkEl.href = "#";
-      linkEl.textContent = `Hint in ${5 - timeElapsed}s`;
+      linkEl.textContent = `Hint in ${HINT_DELAY_SECONDS - timeElapsed}s`;
       linkEl.className =
         "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm";
       linkEl.style.opacity = "0.5";

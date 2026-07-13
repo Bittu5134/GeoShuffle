@@ -37,4 +37,3 @@ export function setupTabToggle(containerId, callback) {
     });
   });
 }
-

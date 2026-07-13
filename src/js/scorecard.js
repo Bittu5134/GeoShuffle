@@ -64,7 +64,17 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     const sWidth = imageWidth * r;
     const sHeight = imageHeight * r;
 
-    ctx.drawImage(baseImg, sx, sy, sWidth, sHeight, imgX, imgY, imageWidth, imageHeight);
+    ctx.drawImage(
+      baseImg,
+      sx,
+      sy,
+      sWidth,
+      sHeight,
+      imgX,
+      imgY,
+      imageWidth,
+      imageHeight,
+    );
 
     // Border around the image
     ctx.strokeStyle = "#173a31";
@@ -75,18 +85,18 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.save();
     ctx.translate(160, 90);
     ctx.rotate(-0.08); // slight slant
-    
+
     // Badge shadow
     ctx.fillStyle = "#173a31";
     ctx.fillRect(-105 + 5, -25 + 5, 210, 50);
-    
+
     // Badge background (warning yellow)
     ctx.fillStyle = "#eab308";
     ctx.fillRect(-105, -25, 210, 50);
     ctx.strokeStyle = "#173a31";
     ctx.lineWidth = 5;
     ctx.strokeRect(-105, -25, 210, 50);
-    
+
     // Badge text (larger size)
     ctx.fillStyle = "#173a31";
     ctx.font = "900 24px Outfit, Fredoka, sans-serif";
@@ -116,13 +126,17 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     const cardW = 220;
     const gap = 30;
 
-    const rankVal = rankText ? (String(rankText).startsWith('#') ? rankText : '#' + rankText) : '#--';
+    const rankVal = rankText
+      ? String(rankText).startsWith("#")
+        ? rankText
+        : "#" + rankText
+      : "#--";
 
     function drawStatCard(x, label, value, accentColor) {
       // Neobrutalist shadow offset
       ctx.fillStyle = "#173a31";
       ctx.fillRect(x + 6, cardY + 6, cardW, cardH);
-      
+
       // Card background (base-200 cream-beige)
       ctx.fillStyle = "#e8dfc7";
       ctx.fillRect(x, cardY, cardW, cardH);
@@ -161,7 +175,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.rotate(0.18);
     ctx.strokeStyle = "#ef4444";
     ctx.lineWidth = 3;
-    
+
     // Outer Circle
     ctx.beginPath();
     ctx.arc(0, 0, 46, 0, Math.PI * 2);
