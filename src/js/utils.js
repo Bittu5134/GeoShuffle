@@ -21,3 +21,20 @@ export function triggerConfetti() {
     if (Date.now() < end) requestAnimationFrame(frame);
   })();
 }
+
+export function setupTabToggle(containerId, callback) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      container.querySelectorAll("button").forEach((b) => {
+        b.classList.add("btn-ghost");
+        b.classList.remove("btn-active");
+      });
+      e.target.classList.remove("btn-ghost");
+      e.target.classList.add("btn-active");
+      callback(e.target.dataset.type);
+    });
+  });
+}
+

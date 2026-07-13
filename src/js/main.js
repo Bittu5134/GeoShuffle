@@ -32,7 +32,7 @@ import {
 } from "./timer.js";
 import { generateScorecard } from "./scorecard.js";
 import { setupSocialShareLinks, triggerNativeShare } from "./share.js";
-import { triggerConfetti } from "./utils.js";
+import { triggerConfetti, setupTabToggle } from "./utils.js";
 import {
   initMultiplayer,
   hostGame,
@@ -466,21 +466,6 @@ function renderLocalLeaderboard() {
   });
 }
 
-function setupTabToggle(containerId, callback) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.querySelectorAll("button").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      container.querySelectorAll("button").forEach((b) => {
-        b.classList.add("btn-ghost");
-        b.classList.remove("btn-active");
-      });
-      e.target.classList.remove("btn-ghost");
-      e.target.classList.add("btn-active");
-      callback(e.target.dataset.type);
-    });
-  });
-}
 
 document.addEventListener("DOMContentLoaded", () => {
   setupProfile();

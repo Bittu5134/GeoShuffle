@@ -1,5 +1,6 @@
 import { fetchGlobalLeaderboard, getLocalHistory } from "./api.js";
 import { formatTime } from "./timer.js";
+import { setupTabToggle } from "./utils.js";
 
 let activeGlobalTab = "time";
 let activeLocalTab = "time";
@@ -64,21 +65,7 @@ function renderLocalLeaderboard() {
   });
 }
 
-function setupTabToggle(containerId, callback) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.querySelectorAll("button").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      container.querySelectorAll("button").forEach((b) => {
-        b.classList.add("btn-ghost");
-        b.classList.remove("btn-active");
-      });
-      e.target.classList.remove("btn-ghost");
-      e.target.classList.add("btn-active");
-      callback(e.target.dataset.type);
-    });
-  });
-}
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const savedTheme = localStorage.getItem("geoTheme") || "geoshuffle";
