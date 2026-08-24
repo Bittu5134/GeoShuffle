@@ -34,5 +34,4 @@ GeoShuffle is a geography sliding puzzle game. Players solve scrambled satellite
 ```bash
 npm install
 npm run dev
-npm run build
 ```
