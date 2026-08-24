@@ -13,7 +13,7 @@
 
 ### What is GeoShuffle?
 
-GeoShuffle is a geography sliding puzzle game. Players solve scrambled satellite images of landmarks and geography locations around the globe, racing against the clock and their moves counter.
+GeoShuffle is a sliding puzzle game. Players solve scrambled images of landmarks and geography locations around the globe, racing against the clock and their moves counter.
 
 ### Features
 
