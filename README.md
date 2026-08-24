@@ -2,7 +2,7 @@
 
 # GeoShuffle
 
-### A Neobrutalist satellite sliding puzzle game with real-time multiplayer.
+### A sliding puzzle game with p2p multiplayer.
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)](https://geoshuffle.bittu.dev)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](/LICENSE)
@@ -13,15 +13,13 @@
 
 ### What is GeoShuffle?
 
-GeoShuffle is a premium geography sliding puzzle game. Players solve scrambled satellite photos of landmarks and geography locations around the globe, racing against the clock and their moves counter.
+GeoShuffle is a geography sliding puzzle game. Players solve scrambled satellite images of landmarks and geography locations around the globe, racing against the clock and their moves counter.
 
 ### Features
 
-- **🧩 Sliding Puzzle Mechanics**: Advanced multi-tile sliding animations using GSAP & Flip.
-- **⚔️ Real-Time P2P Multiplayer**: Challenge friends or match with random players globally using PeerJS and PeerBasket.
-- **🌍 Global & Local Leaderboards**: Compete for top ranks in Supabase-backed leaderboards.
-- **📸 Shareable Scorecards**: Instantly generate beautiful canvas scorecards to download or share.
-- **🎨 Modern Neobrutalist Design**: Premium layout styled with HSL custom themes and responsive glassmorphism.
+- **P2P Multiplayer**: Challenge friends or match with random players globally (using PeerJS and [PeerBasket](https://peerbasket.bittu.dev)).
+- **Leaderboards**: Compete for top ranks in global leaderboards.
+- **Shareable Scorecards**: Instantly generate scorecards to download or share.
 
 ### Tech Stack
 
@@ -31,22 +29,10 @@ GeoShuffle is a premium geography sliding puzzle game. Players solve scrambled s
 - **Database**: Supabase
 - **Bundler**: Vite
 
-### Getting Started
-
-Install dependencies:
+### Self-Hosting
 
 ```bash
 npm install
-```
-
-Start the development server:
-
-```bash
 npm run dev
-```
-
-Build for production:
-
-```bash
 npm run build
 ```
