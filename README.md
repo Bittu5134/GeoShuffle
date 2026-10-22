@@ -1,37 +1,68 @@
 <div align="center">
+<img src="./src/assets/logo.png", width="300" alt="GeoShuffle gameplay" />
 
-# GeoShuffle
+# Geo · Shuffle
 
-### A sliding puzzle game with p2p multiplayer.
+### **A sliding puzzle of satellite imagery with P2P multiplayer.**  
+### [Play now at geoshuffle.bittu.dev](https://geoshuffle.bittu.dev)
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square)](https://geoshuffle.bittu.dev)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](/LICENSE)
+<br>
+
+<img src="screenshots/fullscreen.png" width="850" alt="GeoShuffle gameplay" />
+
+<br>
 
 </div>
 
----
+## How To Play
 
-### What is GeoShuffle?
+- Every match scrambles a satellite view of a landmark on Earth.
+- Slide tiles into the empty space to reconstruct the complete satellite photo.
+- Hints unlock after 45 seconds if you're stuck.
+- Minimize your move count to rank higher.
+- Complete the puzzle to reveal the location, and get a scorecard.
 
-GeoShuffle is a sliding puzzle game. Players solve scrambled images of landmarks and geography locations around the globe, racing against the clock and their moves counter.
 
-### Features
+## Controls
 
-- **P2P Multiplayer**: Challenge friends or match with random players globally (using PeerJS and [PeerBasket](https://peerbasket.bittu.dev)).
-- **Leaderboards**: Compete for top ranks in global leaderboards.
-- **Shareable Scorecards**: Instantly generate scorecards to download or share.
+- Slide tiles using `W` `A` `S` `D` or `Arrow` keys.
+- Click or tap any tile along the row or column of the gap to slide it.
+- Swipe across the puzzle grid on touchscreens and mobile devices.
 
-### Tech Stack
 
-- **Frontend**: HTML5, Vanilla JavaScript, CSS3
-- **Animations**: GSAP, GSAP Flip
-- **Multiplayer**: PeerJS, WebRTC, PeerBasket
-- **Database**: Supabase
-- **Bundler**: Vite
+## Game Modes
 
-### Self-Hosting
+The game supports both Singleplayer and Multiplayer (using [PeerBasket](https://peerbasket.bittu.dev/)).
 
+## Scorecards & Leaderboards
+
+<div align="center">
+  <img src="screenshots/win.png" width="460" alt="GeoShuffle puzzle solved modal" />
+  &nbsp;&nbsp;
+  <img src="screenshots/win_card.png" width="370" alt="GeoShuffle passport scorecard" />
+</div>
+
+<br>
+
+## Other Features
+
+- **Global Leaderboard**: Uses Supabase for it.
+- **Scorecards**: Generated on the client side.
+- **P2P Multiplayer**: Uses WebRTC, PeerJS and [PeerBasket](https://peerbasket.bittu.dev/) to directly connect two browsers to enable Multiplayer gameplay without a central server.
+
+
+## Run Locally
+
+Clone this Git repository locally and run these commands:
 ```bash
 npm install
 npm run dev
 ```
+
+<br>
+
+## Built Using
+
+[GSAP](https://gsap.com/) · [GSAP Flip](https://gsap.com/docs/v3/Plugins/Flip/) · [PeerJS](https://peerjs.com/) · [PeerBasket](https://peerbasket.bittu.dev) · [Supabase](https://supabase.com/) · [Tailwind CSS](https://tailwindcss.com/) · [DaisyUI](https://daisyui.com/) · [Vite](https://vitejs.dev/)
+
+<br>
