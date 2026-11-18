@@ -10,6 +10,16 @@ export function dataURLtoFile(dataurl, filename) {
   return new File([u8arr], filename, { type: mime });
 }
 
+// The scorecard is a PNG snapshot, so it can't inherit CSS variables the way
+// the page does. Read the active daisy theme tokens at draw time instead of
+// hardcoding hexes, so the card matches the theme the player is using.
+function themeColor(name, fallback) {
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(`--color-${name}`)
+    .trim();
+  return value || fallback;
+}
+
 export function generateScorecard(currentMap, timeText, movesText, rankText) {
   const previewImg = document.getElementById("scorecard-preview");
   const loadingEl = document.getElementById("scorecard-loading");
@@ -17,6 +27,11 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
 
   if (previewImg) previewImg.classList.add("hidden");
   if (loadingEl) loadingEl.classList.remove("hidden");
+
+  const ink = themeColor("neutral", ink);
+  const paper = themeColor("base-100", paper);
+  const panel = themeColor("base-200", panel);
+  const accent = themeColor("warning", accent);
 
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -39,11 +54,11 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     canvas.height = h;
 
     // 1. App Base Background color (base-100 cream)
-    ctx.fillStyle = "#fff9e6";
+    ctx.fillStyle = paper;
     ctx.fillRect(0, 0, w, h);
 
     // 2. Thick outer neutral border (hunter green)
-    ctx.strokeStyle = "#173a31";
+    ctx.strokeStyle = ink;
     ctx.lineWidth = 16;
     ctx.strokeRect(8, 8, w - 16, h - 16);
 
@@ -53,7 +68,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     const imageWidth = 720;
     const imageHeight = 480;
 
-    ctx.fillStyle = "#e8dfc7";
+    ctx.fillStyle = panel;
     ctx.fillRect(imgX, imgY, imageWidth, imageHeight);
 
     const iw = baseImg.naturalWidth || 800;
@@ -77,7 +92,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     );
 
     // Border around the image
-    ctx.strokeStyle = "#173a31";
+    ctx.strokeStyle = ink;
     ctx.lineWidth = 8;
     ctx.strokeRect(imgX, imgY, imageWidth, imageHeight);
 
@@ -87,19 +102,19 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.rotate(-0.08); // slight slant
 
     // Badge shadow
-    ctx.fillStyle = "#173a31";
+    ctx.fillStyle = ink;
     ctx.fillRect(-105 + 5, -25 + 5, 210, 50);
 
     // Badge background (warning yellow)
-    ctx.fillStyle = "#eab308";
+    ctx.fillStyle = accent;
     ctx.fillRect(-105, -25, 210, 50);
-    ctx.strokeStyle = "#173a31";
+    ctx.strokeStyle = ink;
     ctx.lineWidth = 5;
     ctx.strokeRect(-105, -25, 210, 50);
 
     // Badge text (larger size)
-    ctx.fillStyle = "#173a31";
-    ctx.font = "900 24px Outfit, Fredoka, sans-serif";
+    ctx.fillStyle = ink;
+    ctx.font = "900 24px Fredoka, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("GEOSHUFFLE", 0, 0);
@@ -110,14 +125,16 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
       .filter(Boolean)
       .join(", ");
 
-    ctx.fillStyle = "rgba(23, 58, 49, 0.6)";
-    ctx.font = "900 14px Outfit, Fredoka, sans-serif";
+    ctx.globalAlpha = 0.6;
+    ctx.fillStyle = ink;
+    ctx.font = "900 14px Fredoka, sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
     ctx.fillText("LOCATION", 40, 550);
+    ctx.globalAlpha = 1;
 
-    ctx.fillStyle = "#173a31";
-    ctx.font = "900 36px Outfit, Fredoka, sans-serif";
+    ctx.fillStyle = ink;
+    ctx.font = "900 36px Fredoka, sans-serif";
     ctx.fillText(locationName || "Unknown Location", 40, 575);
 
     // 6. Stats Cards Grid matching the Victory Modal style (base-200 cards)
@@ -134,26 +151,26 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
 
     function drawStatCard(x, label, value, accentColor) {
       // Neobrutalist shadow offset
-      ctx.fillStyle = "#173a31";
+      ctx.fillStyle = ink;
       ctx.fillRect(x + 6, cardY + 6, cardW, cardH);
 
       // Card background (base-200 cream-beige)
-      ctx.fillStyle = "#e8dfc7";
+      ctx.fillStyle = panel;
       ctx.fillRect(x, cardY, cardW, cardH);
-      ctx.strokeStyle = "#173a31";
+      ctx.strokeStyle = ink;
       ctx.lineWidth = 5;
       ctx.strokeRect(x, cardY, cardW, cardH);
 
       // Card Label
-      ctx.fillStyle = "#173a31";
-      ctx.font = "900 13px Outfit, Fredoka, sans-serif";
+      ctx.fillStyle = ink;
+      ctx.font = "900 13px Fredoka, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
       ctx.fillText(label, x + cardW / 2, cardY + 22);
 
       // Card Value (matching modal text-emerald-700 / text-amber-600)
       ctx.fillStyle = accentColor;
-      ctx.font = "900 32px Outfit, Fredoka, sans-serif";
+      ctx.font = "900 32px Fredoka, sans-serif";
       ctx.textBaseline = "middle";
       ctx.fillText(value, x + cardW / 2, cardY + 70);
     }
@@ -163,8 +180,8 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     drawStatCard(40 + (cardW + gap) * 2, "🏆 RANK", rankVal, "#b45309");
 
     // 7. Larger Watermark Domain Name at bottom left
-    ctx.fillStyle = "#173a31";
-    ctx.font = "900 20px Outfit, Fredoka, sans-serif";
+    ctx.fillStyle = ink;
+    ctx.font = "900 20px Fredoka, sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
     ctx.fillText("geoshuffle.bittu.dev", 40, 890);
@@ -188,11 +205,11 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
 
     // Stamp text
     ctx.fillStyle = "#ef4444";
-    ctx.font = "900 11px Outfit, Fredoka, sans-serif";
+    ctx.font = "900 11px Fredoka, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("PASSPORT", 0, -12);
-    ctx.font = "900 14px Outfit, Fredoka, sans-serif";
+    ctx.font = "900 14px Fredoka, sans-serif";
     ctx.fillText("SOLVED", 0, 8);
     ctx.restore();
 

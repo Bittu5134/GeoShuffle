@@ -32,7 +32,7 @@
         </div>
         <a
           href="./"
-          class="btn neo-btn neo-btn-outline px-4 py-2 font-bold text-xs sm:text-sm my-auto"
+          class="neo-btn neo-btn-outline px-4 py-2 font-bold text-xs sm:text-sm my-auto"
         >
           <svg class="size-5">
             <use href="./assets/icons.svg#controller"></use>
@@ -96,7 +96,7 @@
                 </h3>
                 <div class="grid grid-cols-2 gap-2 text-xs">
                   <div
-                    class="bg-base-200 border border-neutral/15 p-2 rounded-lg"
+                    class="bg-base-200 p-2 rounded-xl"
                   >
                     <kbd
                       class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
@@ -110,7 +110,7 @@
                     <span class="block mt-1 opacity-75">Slide tile up</span>
                   </div>
                   <div
-                    class="bg-base-200 border border-neutral/15 p-2 rounded-lg"
+                    class="bg-base-200 p-2 rounded-xl"
                   >
                     <kbd
                       class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
@@ -124,7 +124,7 @@
                     <span class="block mt-1 opacity-75">Slide tile down</span>
                   </div>
                   <div
-                    class="bg-base-200 border border-neutral/15 p-2 rounded-lg"
+                    class="bg-base-200 p-2 rounded-xl"
                   >
                     <kbd
                       class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
@@ -138,7 +138,7 @@
                     <span class="block mt-1 opacity-75">Slide tile left</span>
                   </div>
                   <div
-                    class="bg-base-200 border border-neutral/15 p-2 rounded-lg"
+                    class="bg-base-200 p-2 rounded-xl"
                   >
                     <kbd
                       class="kbd kbd-sm font-bold bg-neutral text-neutral-content"
@@ -250,8 +250,11 @@
           <p class="text-sm leading-relaxed mb-4">
             Track your progress and share your puzzle achievements:
           </p>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mt-2">
-            <div class="bg-base-200 border border-neutral/15 p-4 rounded-xl">
+          <!-- One flat strip with dividers instead of three cards in a card -->
+          <div
+            class="grid grid-cols-1 sm:grid-cols-3 rounded-xl bg-base-200 divide-y-2 sm:divide-y-0 sm:divide-x-2 divide-neutral text-sm mt-2"
+          >
+            <div class="p-4">
               <h3 class="font-extrabold mb-1">Global Leaderboard</h3>
               <p class="opacity-75 text-xs leading-relaxed">
                 When you solve a puzzle, your score is automatically sent to the
@@ -259,7 +262,7 @@
                 compared to players globally!
               </p>
             </div>
-            <div class="bg-base-200 border border-neutral/15 p-4 rounded-xl">
+            <div class="p-4">
               <h3 class="font-extrabold mb-1">Personal Runs</h3>
               <p class="opacity-75 text-xs leading-relaxed">
                 Your last 100 solved runs are saved locally. Review your own
@@ -267,7 +270,7 @@
                 leaderboard tab.
               </p>
             </div>
-            <div class="bg-base-200 border border-neutral/15 p-4 rounded-xl">
+            <div class="p-4">
               <h3 class="font-extrabold mb-1">Download & Share</h3>
               <p class="opacity-75 text-xs leading-relaxed">
                 Once solved, you can click "Download Scorecard" to save a
@@ -280,7 +283,7 @@
       </div>
 
       <footer
-        class="mt-8 text-center text-xs opacity-50 border-t border-neutral/10 pt-4 pb-2"
+        class="mt-8 text-center text-xs opacity-50 border-t-2 border-neutral/10 pt-4 pb-2"
       >
         GeoShuffle &copy; 2026. Made by
         <a
@@ -288,7 +291,14 @@
           target="_blank"
           class="hover:underline font-bold"
           >Bittu</a
-        >.
+        >.<br />
+        <a
+          href="https://www.patreon.com/cw/LazyBittu"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:underline font-bold"
+          >Support on Patreon</a
+        >
       </footer>
     </main>
 

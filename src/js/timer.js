@@ -1,6 +1,8 @@
 import { gsap } from "gsap";
 
-export const HINT_DELAY_SECONDS = 45;
+// TESTING: hint cooldown shortened from 45s so the reveal path can be tested
+// without waiting. Restore to 45 before release.
+export const HINT_DELAY_SECONDS = 5;
 
 let timerInterval = null;
 let timeElapsed = 0;
@@ -65,24 +67,35 @@ export function updateLocationPanel(currentMap, showFullDetails = false) {
       });
     }
     linkEl.href = currentMap.map || "#";
+    linkEl.setAttribute("target", "_blank");
+    linkEl.removeAttribute("tabindex");
+    linkEl.removeAttribute("aria-disabled");
     linkEl.innerHTML = `<svg class="size-5 inline mr-1"><use href="./assets/icons.svg#pin"></use></svg> View on Google Maps`;
     linkEl.className =
-      "btn btn-success font-bold rounded-xl text-xs sm:text-sm shadow-md";
+      "neo-btn neo-btn-success px-3 py-2 text-xs sm:text-sm font-bold";
     linkEl.style.opacity = "1";
   } else {
     detailsEl.textContent = "Location is hidden!";
 
     if (timeElapsed >= HINT_DELAY_SECONDS) {
       linkEl.href = currentMap.map || "#";
+      linkEl.setAttribute("target", "_blank");
+      linkEl.removeAttribute("tabindex");
+      linkEl.removeAttribute("aria-disabled");
       linkEl.innerHTML = `<svg class="size-5 inline mr-1"><use href="./assets/icons.svg#pin"></use></svg> Open in Maps (Hint)`;
       linkEl.className =
-        "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm shadow-md";
+        "neo-btn neo-btn-outline px-3 py-2 text-xs sm:text-sm font-bold";
       linkEl.style.opacity = "1";
     } else {
       linkEl.href = "#";
+      linkEl.removeAttribute("target");
+      // Cooldown state: not an actionable control. Non-focusable, no hover
+      // lift, no click-through — it is just a countdown label.
+      linkEl.setAttribute("aria-disabled", "true");
+      linkEl.setAttribute("tabindex", "-1");
       linkEl.textContent = `Hint in ${HINT_DELAY_SECONDS - timeElapsed}s`;
       linkEl.className =
-        "btn btn-outline border-neutral font-bold rounded-xl text-xs sm:text-sm";
+        "neo-btn neo-btn-outline px-3 py-2 text-xs sm:text-sm font-bold pointer-events-none";
       linkEl.style.opacity = "0.5";
     }
   }

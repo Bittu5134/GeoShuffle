@@ -36,7 +36,7 @@
           <a
             href="https://discord.gg/CZdNvKaNNr"
             target="_blank"
-            class="btn neo-btn neo-btn-square text-base-content"
+            class="neo-btn neo-btn-square text-base-content"
             title="Join Discord Server"
           >
             <svg class="size-5 fill-current">
@@ -46,7 +46,7 @@
           <a
             href="https://www.patreon.com/cw/LazyBittu"
             target="_blank"
-            class="btn neo-btn neo-btn-square text-base-content"
+            class="neo-btn neo-btn-square text-base-content"
             title="Support on Patreon"
           >
             <svg class="size-5 fill-current">
@@ -54,7 +54,7 @@
             </svg>
           </a>
           <button
-            class="btn neo-btn neo-btn-square text-base-content font-bold text-xl"
+            class="neo-btn neo-btn-square text-base-content font-bold text-xl"
             onclick="settings_modal.showModal()"
           >
             <svg class="size-5 fill-current">
@@ -64,13 +64,13 @@
         </div>
       </header>
 
-      <div class="divider border-neutral/10 mb-6"></div>
+      <div class="border-t-2 border-neutral/10 mb-6"></div>
 
       <section
-        class="flex flex-row items-center justify-between gap-3 sm:gap-4 w-full mb-6 box-border"
+        class="flex flex-row items-stretch justify-between gap-3 sm:gap-4 w-full mb-6 box-border"
       >
         <div
-          class="flex flex-col items-center justify-center flex-1 min-w-0 p-3 bg-base-200/50 border border-base-content/10 rounded-xl"
+          class="neo-panel bg-base-200/50 flex flex-col items-center justify-center flex-1 min-w-0 p-3"
         >
           <span
             class="text-xs uppercase font-bold opacity-60 whitespace-nowrap tracking-widest"
@@ -82,7 +82,7 @@
         </div>
 
         <div
-          class="flex flex-col items-center justify-center flex-1 min-w-0 p-3 bg-base-200/50 border border-base-content/10 rounded-xl"
+          class="neo-panel bg-base-200/50 flex flex-col items-center justify-center flex-1 min-w-0 p-3"
         >
           <span
             class="text-xs uppercase font-bold opacity-60 whitespace-nowrap tracking-widest"
@@ -98,7 +98,7 @@
         <!-- Opponent Moves Card -->
         <div
           id="stat-opponent-container"
-          class="hidden flex flex-col items-center justify-center flex-1 min-w-0 p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl relative"
+          class="neo-panel hidden flex flex-col items-center justify-center flex-1 min-w-0 p-3 bg-rose-500/10 border-rose-500/40 relative"
         >
           <span
             class="text-xs uppercase font-bold opacity-60 whitespace-nowrap text-rose-700 tracking-widest"
@@ -113,7 +113,7 @@
 
         <button
           id="new-game"
-          class="btn btn-warning flex-[1.2] min-w-0 text-sm sm:text-base font-bold rounded-xl whitespace-nowrap shadow-md py-8"
+          class="neo-btn neo-btn-warning flex-1 min-w-0 px-2 sm:px-3 py-2 text-sm sm:text-base font-bold whitespace-nowrap"
         >
           <svg class="size-5">
             <use href="./assets/icons.svg#shuffle"></use>
@@ -125,7 +125,7 @@
       <!-- Room Code Badge -->
       <div id="mp-room-badge" class="hidden justify-center mb-4">
         <span
-          class="bg-neutral text-base-100 font-extrabold px-3 py-1 text-xs rounded-xl shadow-sm uppercase tracking-wider flex items-center gap-1.5 border-2 border-neutral"
+          class="bg-neutral text-base-100 font-extrabold px-3 py-1 text-xs rounded-xl uppercase tracking-wider flex items-center gap-1.5 border-2 border-neutral"
         >
           <span> Room:</span>
           <span id="mp-room-code" class="text-warning">------</span>
@@ -135,7 +135,7 @@
       <section class="mb-8 w-full flex justify-center">
         <div
           id="board"
-          class="aspect-6/4 bg-base-200 border border-base-content/10 rounded-xl overflow-hidden shadow-lg"
+          class="aspect-6/4 bg-base-200 rounded-xl overflow-hidden"
         ></div>
       </section>
 
@@ -154,7 +154,7 @@
             Multiplayer
             <span
               id="mp-online-count"
-              class="text-xs font-bold opacity-60 bg-base-300 px-2 py-0.5 rounded-lg hidden"
+              class="text-xs font-bold opacity-60 bg-base-300 px-2 py-0.5 rounded-xl hidden"
               >Calculating...</span
             >
             <span
@@ -172,14 +172,14 @@
           <!-- Connection Status Info -->
           <div
             id="mp-status-banner"
-            class="bg-base-200/50 border border-base-content/10 rounded-xl p-3 text-xs sm:text-sm font-bold flex items-center justify-between gap-2"
+            class="border-b-2 border-neutral/10 pb-3 text-xs sm:text-sm font-bold flex items-center justify-between gap-2"
           >
             <span id="mp-status-text" class="opacity-75"
               >Solo Mode active.</span
             >
             <button
               id="btn-cancel-mp"
-              class="btn btn-xs btn-error font-bold rounded-lg hidden"
+              class="neo-btn neo-btn-error px-2.5 py-1 text-[11px] font-bold hidden"
             >
               Disconnect
             </button>
@@ -208,9 +208,7 @@
               </button>
             </div>
 
-            <div
-              class="flex flex-col gap-2 bg-base-200/30 p-2.5 border border-base-content/10 rounded-xl"
-            >
+            <div class="flex flex-col gap-2">
               <span
                 class="text-xs uppercase font-extrabold opacity-65 tracking-wider"
                 >Join Private Room</span
@@ -220,12 +218,12 @@
                   id="mp-join-input"
                   type="text"
                   placeholder="ROOM CODE"
-                  class="input input-sm input-bordered font-extrabold text-center tracking-widest text-base-content rounded-lg flex-1 min-w-0"
+                  class="input input-sm font-extrabold text-center tracking-widest text-base-content border-2 border-neutral rounded-xl flex-1 min-w-0"
                   maxlength="8"
                 />
                 <button
                   id="btn-join-lobby"
-                  class="btn btn-sm btn-neutral font-bold rounded-lg px-4"
+                  class="neo-btn neo-btn-neutral px-4 py-1.5 text-sm font-bold"
                 >
                   Join
                 </button>
@@ -238,7 +236,7 @@
       <!-- Location Hint & Details Panel -->
       <section
         id="location-panel"
-        class="w-full p-4 mb-8 bg-base-200/50 border border-base-content/10 rounded-xl font-bold flex flex-col sm:flex-row items-center justify-between gap-4 box-border shadow-md"
+        class="neo-card w-full p-4 mb-8 font-bold flex flex-col sm:flex-row items-center justify-between gap-4 box-border"
       >
         <div class="flex items-center gap-3">
           <svg class="w-10 size-10 fill-current">
@@ -262,7 +260,7 @@
             id="location-link"
             href="#"
             target="_blank"
-            class="btn btn-primary font-bold rounded-xl text-xs sm:text-sm shadow-md"
+            class="neo-btn neo-btn-primary px-3 py-2 text-xs sm:text-sm font-bold"
           >
             <svg class="size-5"><use href="./assets/icons.svg#pin"></use></svg>
             Reveal Location
@@ -281,7 +279,7 @@
               </svg>
               Global Rankings
             </h2>
-            <div id="global-tabs" class="join bg-base-300/30 p-0.5 rounded-xl">
+            <div id="global-tabs" class="join">
               <button
                 class="btn btn-sm join-item font-bold border-none btn-active"
                 data-type="time"
@@ -300,7 +298,7 @@
             <table id="global-table" class="table w-full text-center font-bold">
               <thead>
                 <tr
-                  class="text-base-content/60 border-b border-neutral/20 text-xs sm:text-sm"
+                  class="text-base-content/60 border-b-2 border-neutral/10 text-xs sm:text-sm"
                 >
                   <th>#</th>
                   <th>Player</th>
@@ -311,19 +309,15 @@
               <tbody></tbody>
             </table>
           </div>
-          <div
-            class="p-3 bg-base-200/50 border-t-2 border-neutral/10 flex justify-center"
+          <a
+            href="./leaderboard"
+            class="p-3 bg-base-200/50 border-t-2 border-neutral/10 flex items-center justify-center gap-2 font-bold text-xs sm:text-sm hover:bg-base-200 transition-colors"
           >
-            <a
-              href="./leaderboard"
-              class="neo-btn neo-btn-outline w-full py-2 text-xs sm:text-sm"
-            >
-              <svg class="size-6 m-1">
-                <use href="./assets/icons.svg#trophy"></use>
-              </svg>
-              View Full Leaderboard
-            </a>
-          </div>
+            <svg class="size-5">
+              <use href="./assets/icons.svg#trophy"></use>
+            </svg>
+            View Full Leaderboard
+          </a>
         </article>
 
         <article class="neo-card">
@@ -336,7 +330,7 @@
               </svg>
               Personal Bests
             </h2>
-            <div id="local-tabs" class="join bg-base-300/30 p-0.5 rounded-xl">
+            <div id="local-tabs" class="join">
               <button
                 class="btn btn-sm join-item font-bold border-none btn-active"
                 data-type="time"
@@ -355,7 +349,7 @@
             <table id="local-table" class="table w-full text-center font-bold">
               <thead>
                 <tr
-                  class="text-base-content/60 border-b border-neutral/20 text-xs sm:text-sm"
+                  class="text-base-content/60 border-b-2 border-neutral/10 text-xs sm:text-sm"
                 >
                   <th>#</th>
                   <th>Date</th>
@@ -369,8 +363,44 @@
         </article>
       </section>
 
+      <!-- Support the project -->
+      <section
+        class="neo-panel mt-8 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left"
+      >
+        <p class="text-sm font-bold">
+          GeoShuffle is free and ad-free.
+          <span class="opacity-70">
+            If it's useful to you, you can support development on Patreon.
+          </span>
+        </p>
+        <div class="flex gap-2.5 shrink-0">
+          <a
+            href="https://www.patreon.com/cw/LazyBittu"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="neo-btn neo-btn-warning px-4 py-2 text-sm font-bold"
+          >
+            <svg class="size-5 fill-current">
+              <use href="./assets/icons.svg#patreon"></use>
+            </svg>
+            Sponsor
+          </a>
+          <a
+            href="https://bittu.dev/discord"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="neo-btn neo-btn-outline px-4 py-2 text-sm font-bold"
+          >
+            <svg class="size-5 fill-current">
+              <use href="./assets/icons.svg#discord"></use>
+            </svg>
+            Discord
+          </a>
+        </div>
+      </section>
+
       <footer
-        class="mt-8 text-center text-xs opacity-50 border-t border-neutral/10 pt-4 pb-2"
+        class="mt-8 text-center text-xs opacity-50 border-t-2 border-neutral/10 pt-4 pb-2"
       >
         GeoShuffle &copy; 2026. Made by
         <a
@@ -404,7 +434,7 @@
             <input
               id="setting-name"
               type="text"
-              class="input input-bordered border-4 border-neutral w-full bg-base-100 text-base-content font-bold rounded-xl"
+              class="input border-2 border-neutral w-full bg-base-100 text-base-content font-bold rounded-xl"
               placeholder="Anonymous"
               maxlength="15"
             />
@@ -412,9 +442,7 @@
 
           <div class="form-control w-full">
             <span class="text-base font-bold mb-2">Display Theme</span>
-            <div
-              class="join w-full bg-base-200 p-1 rounded-xl border border-neutral/10"
-            >
+            <div class="join w-full">
               <button
                 class="btn btn-xs sm:btn-sm join-item flex-1 border-none bg-neutral text-base-100"
                 data-theme-btn="geoshuffle"
@@ -468,7 +496,7 @@
           <input
             id="prompt-name-input"
             type="text"
-            class="input input-bordered border-4 border-neutral w-full bg-base-100 text-base-content font-bold rounded-xl"
+            class="input border-2 border-neutral w-full bg-base-100 text-base-content font-bold rounded-xl"
             placeholder="Nickname"
             maxlength="15"
           />
@@ -506,11 +534,11 @@
         <p id="victory-subtitle" class="text-center text-sm opacity-80 mb-4">
           You completed the puzzle successfully!
         </p>
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-3 gap-3 mb-6">
-          <div
-            class="bg-base-200 border-2 border-neutral p-2.5 rounded-xl text-center"
-          >
+        <!-- Stats Grid: one flat strip with dividers, not a card per stat -->
+        <div
+          class="grid grid-cols-3 rounded-xl bg-base-200 divide-x-2 divide-neutral mb-6"
+        >
+          <div class="p-2.5 text-center">
             <span class="text-sm uppercase opacity-75 block">Time</span>
             <span
               id="victory-time"
@@ -518,9 +546,7 @@
               >00:00</span
             >
           </div>
-          <div
-            class="bg-base-200 border-2 border-neutral p-2.5 rounded-xl text-center"
-          >
+          <div class="p-2.5 text-center">
             <span class="text-sm uppercase opacity-75 block">Moves</span>
             <span
               id="victory-moves"
@@ -528,9 +554,7 @@
               >0</span
             >
           </div>
-          <div
-            class="bg-base-200 border-2 border-neutral p-2.5 rounded-xl text-center"
-          >
+          <div class="p-2.5 text-center">
             <span class="text-sm uppercase opacity-75 block">Global Rank</span>
             <span
               id="victory-rank"
@@ -693,11 +717,11 @@
           Your opponent solved the puzzle first!
         </p>
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 gap-3 mb-6">
-          <div
-            class="bg-base-200 border-2 border-neutral p-2.5 rounded-xl text-center"
-          >
+        <!-- Stats Grid: one flat strip with a divider -->
+        <div
+          class="grid grid-cols-2 rounded-xl bg-base-200 divide-x-2 divide-neutral mb-6"
+        >
+          <div class="p-2.5 text-center">
             <span class="text-sm uppercase opacity-75 block"
               >Opponent Time</span
             >
@@ -707,9 +731,7 @@
               >00:00</span
             >
           </div>
-          <div
-            class="bg-base-200 border-2 border-neutral p-2.5 rounded-xl text-center"
-          >
+          <div class="p-2.5 text-center">
             <span class="text-sm uppercase opacity-75 block"
               >Opponent Moves</span
             >

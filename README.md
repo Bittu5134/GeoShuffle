@@ -6,6 +6,9 @@
 ### **A sliding puzzle of satellite imagery with P2P multiplayer.**  
 ### [Play now at geoshuffle.bittu.dev](https://geoshuffle.bittu.dev)
 
+[![Discord](https://img.shields.io/discord/877508637814300683?logo=discord&logoColor=white)](https://bittu.dev/discord)
+[![Patreon](https://img.shields.io/badge/Patreon-LazyBittu-F96854?logo=patreon&logoColor=white)](https://www.patreon.com/cw/LazyBittu)
+
 <br>
 
 <img src="screenshots/fullscreen.png" width="850" alt="GeoShuffle gameplay" />
@@ -50,6 +53,12 @@ The game supports both Singleplayer and Multiplayer (using [PeerBasket](https://
 - **Scorecards**: Generated on the client side.
 - **P2P Multiplayer**: Uses WebRTC, PeerJS and [PeerBasket](https://peerbasket.bittu.dev/) to directly connect two browsers to enable Multiplayer gameplay without a central server.
 
+
+## Support
+
+GeoShuffle is free and ad-free. If it's useful to you, you can support development on
+[Patreon](https://www.patreon.com/cw/LazyBittu), or come hang out on
+[Discord](https://bittu.dev/discord).
 
 ## Run Locally
 
