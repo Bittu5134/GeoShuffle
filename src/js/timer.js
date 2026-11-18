@@ -1,4 +1,5 @@
 import { gsap } from "gsap";
+import iconsUrl from "../assets/icons.svg?url";
 
 // TESTING: hint cooldown shortened from 45s so the reveal path can be tested
 // without waiting. Restore to 45 before release.
@@ -6,6 +7,13 @@ export const HINT_DELAY_SECONDS = 5;
 
 let timerInterval = null;
 let timeElapsed = 0;
+
+// The sprite must be referenced through the bundler (hashed asset URL in
+// production, ./assets in dev) — a hardcoded "./assets/icons.svg" 404s after
+// a build, which is why the pin icon went missing.
+function pinLabel(text) {
+  return `<svg class="size-5 shrink-0 fill-current" aria-hidden="true"><use href="${iconsUrl}#pin"></use></svg><span>${text}</span>`;
+}
 
 export function formatTime(totalSeconds) {
   const mins = Math.floor(totalSeconds / 60)
@@ -70,9 +78,9 @@ export function updateLocationPanel(currentMap, showFullDetails = false) {
     linkEl.setAttribute("target", "_blank");
     linkEl.removeAttribute("tabindex");
     linkEl.removeAttribute("aria-disabled");
-    linkEl.innerHTML = `<svg class="size-5 inline mr-1"><use href="./assets/icons.svg#pin"></use></svg> View on Google Maps`;
+    linkEl.innerHTML = pinLabel("View on Google Maps");
     linkEl.className =
-      "neo-btn neo-btn-success px-3 py-2 text-xs sm:text-sm font-bold";
+      "neo-btn neo-btn-flat neo-btn-success px-3 py-2 text-xs sm:text-sm font-bold";
     linkEl.style.opacity = "1";
   } else {
     detailsEl.textContent = "Location is hidden!";
@@ -82,9 +90,9 @@ export function updateLocationPanel(currentMap, showFullDetails = false) {
       linkEl.setAttribute("target", "_blank");
       linkEl.removeAttribute("tabindex");
       linkEl.removeAttribute("aria-disabled");
-      linkEl.innerHTML = `<svg class="size-5 inline mr-1"><use href="./assets/icons.svg#pin"></use></svg> Open in Maps (Hint)`;
+      linkEl.innerHTML = pinLabel("Open in Maps");
       linkEl.className =
-        "neo-btn neo-btn-outline px-3 py-2 text-xs sm:text-sm font-bold";
+        "neo-btn neo-btn-flat neo-btn-outline px-3 py-2 text-xs sm:text-sm font-bold";
       linkEl.style.opacity = "1";
     } else {
       linkEl.href = "#";
@@ -93,9 +101,9 @@ export function updateLocationPanel(currentMap, showFullDetails = false) {
       // lift, no click-through — it is just a countdown label.
       linkEl.setAttribute("aria-disabled", "true");
       linkEl.setAttribute("tabindex", "-1");
-      linkEl.textContent = `Hint in ${HINT_DELAY_SECONDS - timeElapsed}s`;
+      linkEl.innerHTML = pinLabel(`Hint in ${HINT_DELAY_SECONDS - timeElapsed}s`);
       linkEl.className =
-        "neo-btn neo-btn-outline px-3 py-2 text-xs sm:text-sm font-bold pointer-events-none";
+        "neo-btn neo-btn-flat neo-btn-outline px-3 py-2 text-xs sm:text-sm font-bold pointer-events-none";
       linkEl.style.opacity = "0.5";
     }
   }

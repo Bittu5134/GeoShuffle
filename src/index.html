@@ -3,7 +3,34 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GeoShuffle</title>
+    <title>GeoShuffle — unscramble the photo, reveal the place</title>
+    <meta
+      name="description"
+      content="A sliding puzzle of aerial imagery with peer-to-peer multiplayer. Unscramble the photo, reveal the place, then share your scorecard."
+    />
+    <meta name="theme-color" content="#f3e7cc" />
+    <meta name="color-scheme" content="light" />
+
+    <!-- Link previews (scorecard sharing depends on these) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GeoShuffle" />
+    <meta property="og:title" content="GeoShuffle — unscramble the photo, reveal the place" />
+    <meta
+      property="og:description"
+      content="A sliding puzzle of aerial imagery with peer-to-peer multiplayer. Unscramble the photo, reveal the place, then share your scorecard."
+    />
+    <meta property="og:url" content="https://geoshuffle.bittu.dev/" />
+    <meta property="og:image" content="https://geoshuffle.bittu.dev/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GeoShuffle — unscramble the photo, reveal the place" />
+    <meta
+      name="twitter:description"
+      content="A sliding puzzle of aerial imagery with peer-to-peer multiplayer. Unscramble the photo, reveal the place, then share your scorecard."
+    />
+    <meta name="twitter:image" content="https://geoshuffle.bittu.dev/og.png" />
+
     <link rel="stylesheet" href="./css/style.css" />
     <link rel="icon" href="./assets/logo.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -38,6 +65,7 @@
             target="_blank"
             class="neo-btn neo-btn-square text-base-content"
             title="Join Discord Server"
+            aria-label="Join the GeoShuffle Discord server"
           >
             <svg class="size-5 fill-current">
               <use href="./assets/icons.svg#discord"></use>
@@ -48,6 +76,7 @@
             target="_blank"
             class="neo-btn neo-btn-square text-base-content"
             title="Support on Patreon"
+            aria-label="Support GeoShuffle on Patreon"
           >
             <svg class="size-5 fill-current">
               <use href="./assets/icons.svg#patreon"></use>
@@ -56,6 +85,7 @@
           <button
             class="neo-btn neo-btn-square text-base-content font-bold text-xl"
             onclick="settings_modal.showModal()"
+            aria-label="Open settings"
           >
             <svg class="size-5 fill-current">
               <use href="./assets/icons.svg#settings"></use>
@@ -174,7 +204,7 @@
             id="mp-status-banner"
             class="border-b-2 border-neutral/10 pb-3 text-xs sm:text-sm font-bold flex items-center justify-between gap-2"
           >
-            <span id="mp-status-text" class="opacity-75"
+            <span id="mp-status-text" class="opacity-75" role="status" aria-live="polite"
               >Solo Mode active.</span
             >
             <button
@@ -531,9 +561,21 @@
         >
           Puzzle Solved!
         </h2>
-        <p id="victory-subtitle" class="text-center text-sm opacity-80 mb-4">
+        <p id="victory-subtitle" class="text-center text-sm opacity-80">
           You completed the puzzle successfully!
         </p>
+        <a
+          id="victory-location"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mx-auto mb-4 flex w-fit items-center gap-1.5 border-b-2 border-neutral/30 pb-0.5 text-base sm:text-lg font-black hover:border-neutral"
+        >
+          <svg class="size-5 shrink-0 fill-current">
+            <use href="./assets/icons.svg#pin"></use>
+          </svg>
+          <span id="victory-location-name">Location</span>
+        </a>
         <!-- Stats Grid: one flat strip with dividers, not a card per stat -->
         <div
           class="grid grid-cols-3 rounded-xl bg-base-200 divide-x-2 divide-neutral mb-6"
@@ -607,16 +649,23 @@
     <dialog id="share_modal" class="modal bg-black/50 backdrop-blur-xs z-[110]">
       <div class="modal-box neo-modal-box max-w-sm">
         <h3
-          class="text-2xl font-black mb-4 uppercase tracking-wide text-center"
+          class="text-2xl font-black mb-3 uppercase tracking-wide text-center"
         >
           Share Your Score
         </h3>
+
+        <!-- Exactly what the platforms/copy button will post -->
+        <p
+          id="share-text-preview"
+          class="mb-4 max-h-32 overflow-y-auto rounded-xl border-2 border-neutral/30 bg-base-200 p-3 text-xs leading-relaxed"
+        ></p>
 
         <div class="grid grid-cols-3 gap-2 mb-5">
           <a
             id="share-twitter"
             href="#"
             target="_blank"
+            rel="noopener noreferrer"
             class="neo-btn neo-btn-outline flex-col py-2.5 min-h-[72px] text-[10px] sm:text-xs px-1"
           >
             <svg class="size-5 mb-1 sm:size-6">
@@ -628,6 +677,7 @@
             id="share-reddit"
             href="#"
             target="_blank"
+            rel="noopener noreferrer"
             class="neo-btn neo-btn-outline flex-col py-2.5 min-h-[72px] text-[10px] sm:text-xs px-1"
           >
             <svg class="size-5 mb-1 sm:size-6">
@@ -639,6 +689,7 @@
             id="share-facebook"
             href="#"
             target="_blank"
+            rel="noopener noreferrer"
             class="neo-btn neo-btn-outline flex-col py-2.5 min-h-[72px] text-[10px] sm:text-xs px-1"
           >
             <svg class="size-5 mb-1 sm:size-6">
@@ -650,6 +701,7 @@
             id="share-telegram"
             href="#"
             target="_blank"
+            rel="noopener noreferrer"
             class="neo-btn neo-btn-outline flex-col py-2.5 min-h-[72px] text-[10px] sm:text-xs px-1"
           >
             <svg class="size-5 mb-1 sm:size-6">
@@ -661,6 +713,7 @@
             id="share-pinterest"
             href="#"
             target="_blank"
+            rel="noopener noreferrer"
             class="neo-btn neo-btn-outline flex-col py-2.5 min-h-[72px] text-[10px] sm:text-xs px-1"
           >
             <svg class="size-5 mb-1 sm:size-6">

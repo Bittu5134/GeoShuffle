@@ -196,22 +196,38 @@ body {
   background-color: var(--color-base-100);
   color: var(--color-base-content);
   box-shadow: 3px 3px 0 0 var(--color-neutral) !important;
+  /* Only transform/shadow animate, at one shared duration: the button body and
+     its label therefore move as a single composited layer (no text lag). */
   transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease,
-    background-color 0.2s ease;
+    transform 0.12s ease-out,
+    box-shadow 0.12s ease-out;
   cursor: pointer;
   user-select: none;
 }
 @media (hover: hover) {
   .neo-btn:hover:not(:disabled) {
-    transform: translate(-2px, -2px) !important;
+    /* Shadow grows, the button stays put — reads tactile without sliding the
+       label around under the cursor. */
     box-shadow: 5px 5px 0 0 var(--color-neutral) !important;
   }
 }
 .neo-btn:active:not(:disabled) {
   transform: translate(3px, 3px) !important;
   box-shadow: 0 0 0 0 var(--color-neutral) !important;
+  will-change: transform;
+}
+/* Flat action: no shadow, no movement. For secondary in-card links.
+   transition:none matters because the class list is swapped at runtime —
+   otherwise the button visibly melts from shadowed to flat. */
+.neo-btn-flat,
+.neo-btn-flat:active:not(:disabled),
+.neo-btn-flat:hover:not(:disabled) {
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+.neo-btn-flat:hover:not(:disabled) {
+  background-color: var(--color-base-200) !important;
 }
 .neo-btn:disabled,
 .neo-btn.btn-disabled {

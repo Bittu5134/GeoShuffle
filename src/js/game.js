@@ -9,7 +9,9 @@ export const COLS = 6;
 export const ROWS = 4;
 
 // TESTING: keep the scramble tiny and the shuffle animation snappy so a solve
-// can be reached in a few clicks. Restore to 200 / 0.5s / 1s before release.
+// can be reached in a few clicks. Restore to 200 / 0.5s / 1s before release,
+// and set TESTING_MODE back to false so scores post to the global board again.
+export const TESTING_MODE = true;
 export const SHUFFLE_STEPS = 5;
 const SHUFFLE_DELAY = 0.15;
 const SHUFFLE_DURATION = 0.45;

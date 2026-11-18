@@ -1,4 +1,5 @@
 import { dataURLtoFile } from "./scorecard.js";
+import iconsUrl from "../assets/icons.svg?url";
 
 export function copyToClipboardFallback(text) {
   const updateBtnVisual = () => {
@@ -6,7 +7,7 @@ export function copyToClipboardFallback(text) {
     if (btn) {
       const originalHtml = btn.innerHTML;
       btn.innerHTML = `
-        <svg class="size-4 text-emerald-600 mb-1"><use href="./assets/icons.svg#checkmark"></use></svg>
+        <svg class="size-4 text-emerald-600 mb-1"><use href="${iconsUrl}#checkmark"></use></svg>
         <span class="text-[9px] uppercase opacity-75">Copied!</span>
       `;
       setTimeout(() => {
@@ -53,10 +54,26 @@ export function buildSharePayload(currentMap, timeText, movesText, rankText) {
   const shareUrl = "https://geoshuffle.bittu.dev";
   const mapLink = currentMap.map || "#";
 
-  const shareText = `I solved the GeoShuffle satellite puzzle for ${locationName} in ${timeText} with ${movesText} moves! Global Rank: ${rankText}. Can you beat me?\n\nPlay here: ${shareUrl}\nGoogle Maps Location: ${mapLink}`;
-  const shareTextWithImg = `${shareText}\n\nSatellite View: ${currentMap.image}`;
+  const hasRank = rankText && String(rankText).replace("#", "").match(/\d/);
+  const rankPhrase = hasRank ? `Global rank ${rankText}. ` : "";
 
-  return { shareText, shareTextWithImg, shareUrl, locationName, mapLink };
+  // Primary line: playful, geography-forward, never says "satellite".
+  const shareText = `${locationName} unscrambled in ${timeText} and ${movesText} moves. ${rankPhrase}A cartographer somewhere just sighed. Think you can beat me?\n\nPlay here: ${shareUrl}`;
+
+  // Short variant for character-limited networks.
+  const shareTextShort = `${locationName} in ${timeText}, ${movesText} moves${hasRank ? `, rank ${rankText}` : ""}. The equator called. It has no comment. Beat me: ${shareUrl}`;
+
+  const shareTextWithImg = `${shareText}\n\nLocation: ${mapLink}`;
+
+  return {
+    shareText,
+    shareTextShort,
+    shareTextWithImg,
+    shareUrl,
+    locationName,
+    mapLink,
+    hasRank,
+  };
 }
 
 export function setupSocialShareLinks(
@@ -65,18 +82,26 @@ export function setupSocialShareLinks(
   movesText,
   rankText,
 ) {
-  const { shareText, shareTextWithImg, shareUrl, locationName, mapLink } =
-    buildSharePayload(currentMap, timeText, movesText, rankText);
-  const redditTitle = `I solved today's GeoShuffle satellite puzzle in ${timeText}!`;
+  const {
+    shareText,
+    shareTextShort,
+    shareTextWithImg,
+    shareUrl,
+    locationName,
+    mapLink,
+    hasRank,
+  } = buildSharePayload(currentMap, timeText, movesText, rankText);
+
+  const redditTitle = `I unscrambled ${locationName} in ${timeText} (${movesText} moves). Can you beat my GeoShuffle run?`;
 
   const shareTwitter = document.getElementById("share-twitter");
   if (shareTwitter) {
-    shareTwitter.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    shareTwitter.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTextShort)}`;
   }
 
   const shareReddit = document.getElementById("share-reddit");
   if (shareReddit) {
-    const redditBody = `I solved today's GeoShuffle satellite puzzle for **${locationName}**!\n\n**Time:** ${timeText}\n**Moves:** ${movesText}\n**Global Rank:** ${rankText}\n\nPlay here: ${shareUrl}\nGoogle Maps Location: ${mapLink}`;
+    const redditBody = `${hasRank ? `Global rank ${rankText}. ` : ""}GeoShuffle is a sliding puzzle where you rebuild a photo to reveal where it was taken. Fair warning: the geography nerds are already on it.\n\nPlay here: ${shareUrl}`;
     shareReddit.href = `https://www.reddit.com/submit?title=${encodeURIComponent(redditTitle)}&text=${encodeURIComponent(redditBody)}`;
   }
 
@@ -87,7 +112,7 @@ export function setupSocialShareLinks(
 
   const shareTelegram = document.getElementById("share-telegram");
   if (shareTelegram) {
-    const telegramText = `${shareText}\n\nSatellite View: ${currentMap.image}`;
+    const telegramText = `${shareText}\n\nLocation: ${mapLink}`;
     shareTelegram.href = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(telegramText)}`;
   }
 
@@ -95,6 +120,9 @@ export function setupSocialShareLinks(
   if (sharePinterest) {
     sharePinterest.href = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}&media=${encodeURIComponent(currentMap.image)}&description=${encodeURIComponent(shareText)}&title=${encodeURIComponent(redditTitle)}`;
   }
+
+  const previewEl = document.getElementById("share-text-preview");
+  if (previewEl) previewEl.textContent = shareText;
 
   const copyShareBtn = document.getElementById("btn-copy-share");
   if (copyShareBtn) {
@@ -125,7 +153,7 @@ export async function triggerNativeShare(
   if (navigator.share) {
     try {
       let shareData = {
-        title: "GeoShuffle Solve",
+        title: "GeoShuffle — unscramble the photo, reveal the place",
         text: shareText,
         url: shareUrl,
       };

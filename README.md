@@ -68,6 +68,13 @@ npm install
 npm run dev
 ```
 
+While developing, `src/js/game.js` exposes two shortcuts you may want to tweak:
+- `TESTING_MODE` — skips global leaderboard submissions (keeps test runs off the shared board).
+- `SHUFFLE_STEPS` / shuffle animation timings — lowered so a solvable board is a few moves away.
+
+Set `TESTING_MODE` to `false` and restore `SHUFFLE_STEPS` to `200` before shipping. The hint
+cooldown lives in `src/js/timer.js` as `HINT_DELAY_SECONDS` (45s in production).
+
 <br>
 
 ## Built Using

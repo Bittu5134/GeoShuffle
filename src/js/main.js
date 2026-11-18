@@ -22,6 +22,7 @@ import {
   setCurrentMap,
   getEarthData,
   SHUFFLE_STEPS,
+  TESTING_MODE,
 } from "./game.js";
 import {
   startTimer,
@@ -360,7 +361,7 @@ async function handleVictory() {
     "Fun fact: none of that was on the test.",
     "The Earth is still round, for now.",
     "This round has been added to the historical record. Probably.",
-    "A GPS satellite blinked in confusion.",
+    "A GPS somewhere recalculated out of respect.",
     "This has been a public geography moment.",
     "No continents were harmed in the making of this round.",
     "The Pacific Ocean remains unimpressed.",
@@ -380,6 +381,16 @@ async function handleVictory() {
   renderBoard(true);
   updateLocationPanel(getCurrentMap(), true);
 
+  // Name the place on the win screen: that is the whole point of the game.
+  const winMap = getCurrentMap();
+  const winPlace =
+    [winMap.region, winMap.country].filter(Boolean).join(", ") ||
+    "Unknown Location";
+  const winLocationEl = document.getElementById("victory-location");
+  const winLocationNameEl = document.getElementById("victory-location-name");
+  if (winLocationNameEl) winLocationNameEl.textContent = winPlace;
+  if (winLocationEl) winLocationEl.href = winMap.map || "#";
+
   // If in private lobby and opponent hasn't solved yet, wait for them!
   if (isConnected() && !isRandomMatch()) {
     const replayBtn = document.getElementById("btn-victory-replay");
@@ -396,27 +407,49 @@ async function handleVictory() {
     }
   }
 
-  await submitScore(playerName, finalTime, finalMoves);
-  const rank = await getScoreRank(finalTime);
-  document.getElementById("victory-rank").textContent = rank;
-
-  generateScorecard(getCurrentMap(), formatTime(finalTime), finalMoves, rank);
-  setupSocialShareLinks(
-    getCurrentMap(),
-    formatTime(finalTime),
-    finalMoves,
-    rank,
-  );
-
-  renderGlobalLeaderboard();
-
+  // Show the win screen first: leaderboard/submit calls are network-bound and
+  // used to gate the modal, so any slow or failed request meant no win screen.
   const victoryModal = document.getElementById("victory_modal");
-  if (victoryModal) {
+  if (victoryModal && !victoryModal.open) {
     victoryModal.showModal();
     setTimeout(() => {
       document.getElementById("btn-victory-replay")?.focus();
     }, 50);
   }
+
+  finalizeVictory(getCurrentMap(), formatTime(finalTime), finalMoves);
+}
+
+// Post-win bookkeeping. Never blocks the modal, never throws into the UI.
+async function finalizeVictory(map, timeText, moves) {
+  let rank = "#--";
+
+  // TESTING_MODE keeps automated 5-move runs off the shared leaderboard.
+  if (!TESTING_MODE) {
+    try {
+      await submitScore(playerName, getTimeElapsed(), moves);
+    } catch (err) {
+      console.warn("Score submit failed:", err);
+    }
+
+    try {
+      rank = await getScoreRank(getTimeElapsed());
+    } catch (err) {
+      console.warn("Rank lookup failed:", err);
+    }
+  }
+
+  const rankEl = document.getElementById("victory-rank");
+  if (rankEl) rankEl.textContent = rank || "#--";
+
+  try {
+    generateScorecard(map, timeText, moves, rank || "#--");
+    setupSocialShareLinks(map, timeText, moves, rank || "#--");
+  } catch (err) {
+    console.warn("Scorecard/share setup failed:", err);
+  }
+
+  renderGlobalLeaderboard();
 }
 
 async function renderGlobalLeaderboard() {
