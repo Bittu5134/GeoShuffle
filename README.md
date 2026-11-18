@@ -3,7 +3,7 @@
 
 # Geo · Shuffle
 
-### **A sliding puzzle of satellite imagery with P2P multiplayer.**  
+### **A sliding puzzle featuring geographical locations with P2P multiplayer.**
 ### [Play now at geoshuffle.bittu.dev](https://geoshuffle.bittu.dev)
 
 [![Discord](https://img.shields.io/discord/877508637814300683?logo=discord&logoColor=white)](https://bittu.dev/discord)
@@ -42,7 +42,7 @@ The game supports both Singleplayer and Multiplayer (using [PeerBasket](https://
 <div align="center">
   <img src="screenshots/win.png" width="460" alt="GeoShuffle puzzle solved modal" />
   &nbsp;&nbsp;
-  <img src="screenshots/win_card.png" width="370" alt="GeoShuffle passport scorecard" />
+  <img src="screenshots/win_card.png" width="330" alt="GeoShuffle downloadable share card" />
 </div>
 
 <br>
@@ -74,6 +74,29 @@ While developing, `src/js/game.js` exposes two shortcuts you may want to tweak:
 
 Set `TESTING_MODE` to `false` and restore `SHUFFLE_STEPS` to `200` before shipping. The hint
 cooldown lives in `src/js/timer.js` as `HINT_DELAY_SECONDS` (45s in production).
+
+### Supabase (Global Leaderboard)
+
+The global leaderboard and rank lookups talk to a [Supabase](https://supabase.com/)
+project over its REST API — there is no custom backend. The project URL and
+publishable key are set at the top of `src/js/api.js`:
+
+```js
+const SUPABASE_URL = "https://<project-ref>.supabase.co";
+const SUPABASE_KEY = "sb_publishable_..."; // publishable (anon) key
+```
+
+To point a self-hosted copy at your own Supabase project:
+
+1. Create a `leaderboard` table with the columns the game reads and writes:
+   `player_name` (text), `time_spent` (int, seconds), `moves_made` (int).
+2. Enable Row Level Security and add policies so the publishable key can
+   `select` and `insert` rows (the game never updates or deletes entries).
+3. Replace `SUPABASE_URL` and `SUPABASE_KEY` in `src/js/api.js` with your
+   project's REST URL and publishable key (Project Settings → API).
+
+If you skip this, the game still runs fine — leaderboard fetches just return
+empty lists and score submissions fail silently in the console.
 
 <br>
 
