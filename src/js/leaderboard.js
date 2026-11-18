@@ -21,7 +21,7 @@ async function renderFullLeaderboard() {
 
   data.forEach((player, i) => {
     const row = document.createElement("tr");
-    row.className = "border-b border-base-content/5 hover:bg-base-content/5";
+    row.className = "border-b border-neutral/10 hover:bg-base-200/60";
     row.innerHTML = `
       <td class="py-3 font-black text-amber-600">#${i + 1}</td>
       <td>${player.player_name}</td>
@@ -54,7 +54,7 @@ function renderLocalLeaderboard() {
 
   sortedLocal.forEach((run, i) => {
     const row = document.createElement("tr");
-    row.className = "border-b border-base-content/5 hover:bg-base-content/5";
+    row.className = "border-b border-neutral/10 hover:bg-base-200/60";
     row.innerHTML = `
       <td class="py-3 font-black">#${i + 1}</td>
       <td>${run.date}</td>

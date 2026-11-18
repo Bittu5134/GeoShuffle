@@ -31,7 +31,7 @@
   --radius-box: 0.5rem;
   --size-selector: 0.25rem;
   --size-field: 0.25rem;
-  --border: 1px;
+  --border: 2px;
   --depth: 0;
   --noise: 0;
 }
@@ -66,9 +66,14 @@
   --radius-box: 1rem;
   --size-selector: 0.25rem;
   --size-field: 0.25rem;
-  --border: 1px;
-  --depth: 1;
+  --border: 2px;
+  --depth: 0;
   --noise: 0;
+}
+
+/* Board frame: bordered, deliberately flat */
+#board {
+  border: 3px solid var(--color-neutral);
 }
 
 body {
@@ -116,13 +121,32 @@ body {
   padding: 0.75rem 0.5rem;
 }
 
-.join .btn-active {
-  background-color: oklch(var(--n)) !important;
-  color: oklch(var(--b1)) !important;
+/* Segmented control (tabs, theme switch): one flat frame, no inner boxes */
+.join {
+  border: 2px solid var(--color-neutral);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: transparent;
+  padding: 0 !important;
+}
+.join > .btn {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background-color: transparent;
+  color: var(--color-base-content);
+}
+.join > .btn + .btn {
+  border-left: 2px solid var(--color-neutral) !important;
+}
+.join .btn-active,
+.join .btn.bg-neutral {
+  background-color: var(--color-neutral) !important;
+  color: var(--color-neutral-content) !important;
   font-weight: 800 !important;
 }
 .join .btn-ghost {
-  color: oklch(var(--bc)) !important;
+  color: var(--color-base-content) !important;
   font-weight: 500 !important;
   opacity: 0.7;
 }
@@ -160,34 +184,62 @@ body {
 }
 
 /* --- NEO-BRUTALIST DESIGN SYSTEM CLASSES --- */
+/* Buttons: flat fill, one hard shadow. Lift on hover, press on click. */
 .neo-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
   font-weight: 800;
-  border: 3px solid var(--color-neutral) !important;
+  border: 2px solid var(--color-neutral) !important;
   border-radius: 0.75rem !important;
   background-color: var(--color-base-100);
   color: var(--color-base-content);
-  box-shadow: 3px 3px 0px 0.5px var(--color-neutral) !important;
+  box-shadow: 3px 3px 0 0 var(--color-neutral) !important;
+  /* Only transform/shadow animate, at one shared duration: the button body and
+     its label therefore move as a single composited layer (no text lag). */
   transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease,
-    background-color 0.2s ease;
+    transform 0.12s ease-out,
+    box-shadow 0.12s ease-out;
   cursor: pointer;
   user-select: none;
 }
-.neo-btn:hover:not(:disabled) {
-  transform: translate(1.5px, 1.5px) !important;
-  box-shadow: 1.5px 1.5px 0px 0.5px var(--color-neutral) !important;
+@media (hover: hover) {
+  .neo-btn:hover:not(:disabled) {
+    /* Shadow grows, the button stays put — reads tactile without sliding the
+       label around under the cursor. */
+    box-shadow: 5px 5px 0 0 var(--color-neutral) !important;
+  }
 }
 .neo-btn:active:not(:disabled) {
   transform: translate(3px, 3px) !important;
-  box-shadow: 0px 0px 0px 0.5px var(--color-neutral) !important;
+  box-shadow: 0 0 0 0 var(--color-neutral) !important;
+  will-change: transform;
 }
-.neo-btn:disabled {
+/* Flat action: no shadow, no movement. For secondary in-card links.
+   transition:none matters because the class list is swapped at runtime —
+   otherwise the button visibly melts from shadowed to flat. */
+.neo-btn-flat,
+.neo-btn-flat:active:not(:disabled),
+.neo-btn-flat:hover:not(:disabled) {
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+.neo-btn-flat:hover:not(:disabled) {
+  background-color: var(--color-base-200) !important;
+}
+.neo-btn:disabled,
+.neo-btn.btn-disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none !important;
+  transform: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .neo-btn {
+    transition: none;
+  }
 }
 
 /* Colors variants */
@@ -221,6 +273,11 @@ body {
   color: var(--color-base-content) !important;
   border-color: var(--color-neutral) !important;
 }
+.neo-btn-error {
+  background-color: var(--color-error) !important;
+  color: var(--color-error-content) !important;
+  border-color: var(--color-neutral) !important;
+}
 
 /* Square size variants */
 .neo-btn-square {
@@ -230,22 +287,37 @@ body {
   flex-shrink: 0;
 }
 
-/* Card layout container styling */
+/* Cards: outlined sections. Shadows belong to tactile controls, not containers. */
 .neo-card {
   background-color: var(--color-base-100) !important;
   border: 3px solid var(--color-neutral) !important;
   border-radius: 0.75rem !important;
-  box-shadow: 4px 4px 0px 0.5px var(--color-neutral) !important;
+  box-shadow: none !important;
   overflow: hidden;
   transition: background-color 0.3s ease;
 }
 
-/* Modal box custom styling override */
+/* Inner block: flat 2px outline, never a second shadow. */
+.neo-panel {
+  border: 2px solid var(--color-neutral);
+  border-radius: 0.75rem;
+  box-shadow: none;
+}
+
+/* Modals: the dark backdrop already separates them; no extra elevation. */
 .neo-modal-box {
   background-color: var(--color-base-100) !important;
   border: 3px solid var(--color-neutral) !important;
   border-radius: 1rem !important;
-  box-shadow: 5px 5px 0px 0.5px var(--color-neutral) !important;
+  box-shadow: none !important;
   color: var(--color-base-content) !important;
   padding: 1.5rem !important;
+}
+
+/* Shadows are reserved for tactile controls (.neo-btn). Flat everywhere else. */
+.modal-box,
+.dropdown-content,
+.toast,
+.tooltip:before {
+  box-shadow: none;
 }

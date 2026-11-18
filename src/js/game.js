@@ -7,7 +7,14 @@ gsap.registerPlugin(Flip);
 
 export const COLS = 6;
 export const ROWS = 4;
+
+// TESTING HOOKS: flip TESTING_MODE to true, drop SHUFFLE_STEPS to ~5 and
+// shorten the delays to reach a solve in a few clicks. Keep the values below
+// at production settings when shipping.
+export const TESTING_MODE = false;
 export const SHUFFLE_STEPS = 200;
+const SHUFFLE_DELAY = 0.5;
+const SHUFFLE_DURATION = 1;
 
 let tiles = [...Array(24).keys()].map((i) => i + 1);
 const tilesEnd = [...tiles];
@@ -83,7 +90,9 @@ export function renderBoard(isGameWon = false) {
     tile.style.backgroundPosition = `${origCol * 20}% ${origRow * 33.3333}%`;
 
     const currentGridOpacity = !isGameWon && numberAssist ? gridOpacity : 0;
-    tile.style.outline = `1px solid rgba(23, 58, 49, ${currentGridOpacity})`;
+    tile.style.outline = `1px solid color-mix(in oklab, var(--color-neutral) ${
+      currentGridOpacity * 45
+    }%, transparent)`;
 
     if (value === 24) {
       tile.classList.add("empty-tile");
@@ -149,8 +158,8 @@ export function shuffleBoard(
   renderBoard(false);
 
   Flip.from(state, {
-    delay: 0.5,
-    duration: 1,
+    delay: SHUFFLE_DELAY,
+    duration: SHUFFLE_DURATION,
     ease: "power4.inOut",
     targets: "#board > div",
     overwrite: "auto",
@@ -228,7 +237,7 @@ function handleTileClick(index) {
     const tilesEl = document.querySelectorAll(".boardTileIndex");
     if (tilesEl.length > 0) {
       gsap.to(tilesEl, {
-        outlineColor: "rgba(23, 58, 49, 0)",
+        outlineColor: "transparent",
         duration: 0.5,
         ease: "power2.out",
       });

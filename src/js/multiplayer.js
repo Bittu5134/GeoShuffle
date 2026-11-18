@@ -1,5 +1,11 @@
 const BASKET_BASE_URL = "https://peerbasket.bittu.dev/basket";
 
+// Timing constants (handshake timeout, keep-alive ping, PeerBasket refresh)
+const CONNECT_TIMEOUT_MS = 10000;
+const P2P_PING_INTERVAL_MS = 10000;
+const LOBBY_POLL_INTERVAL_MS = 12000;
+const MAX_MISSED_PONGS = 2;
+
 let peer = null;
 let conn = null;
 let roomCode = null;
@@ -13,29 +19,43 @@ let missedPongsCount = 0;
 let matchmakingPeersSeen = new Set();
 
 function startP2PHeartbeat() {
-  if (p2pHeartbeatInterval) clearInterval(p2pHeartbeatInterval);
+  stopP2PHeartbeat();
   missedPongsCount = 0;
 
   p2pHeartbeatInterval = setInterval(() => {
     if (conn && conn.open) {
       missedPongsCount++;
-      if (missedPongsCount > 2) {
+      if (missedPongsCount > MAX_MISSED_PONGS) {
         console.warn("Connection lost (missed pongs). Disconnecting.");
         stopP2PHeartbeat();
-        if (conn) conn.close();
+        conn.close();
         return;
       }
       conn.send({ type: "ping" });
     } else {
       stopP2PHeartbeat();
     }
-  }, 10000); // Every 10 seconds
+  }, P2P_PING_INTERVAL_MS);
 }
 
 function stopP2PHeartbeat() {
   if (p2pHeartbeatInterval) {
     clearInterval(p2pHeartbeatInterval);
     p2pHeartbeatInterval = null;
+  }
+}
+
+function stopLobbyHeartbeat() {
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = null;
+  }
+}
+
+function stopConnectTimeout() {
+  if (connectionTimeout) {
+    clearTimeout(connectionTimeout);
+    connectionTimeout = null;
   }
 }
 
@@ -61,66 +81,43 @@ export function getRoomCode() {
 export function getRole() {
   return role;
 }
-export function getPeerId() {
-  return peer ? peer.id : null;
-}
 export function isConnected() {
   return conn && conn.open;
 }
 
-// Core clean up routine
-export function cancelMultiplayer() {
+// Single teardown used by cancel, opponent-drop and new-session setup.
+function teardown({ destroyPeer = false, status = null } = {}) {
   isMatchmaking = false;
   role = null;
   roomCode = null;
 
   stopP2PHeartbeat();
-  if (connectionTimeout) {
-    clearTimeout(connectionTimeout);
-    connectionTimeout = null;
-  }
-
-  if (heartbeatInterval) {
-    clearInterval(heartbeatInterval);
-    heartbeatInterval = null;
-  }
+  stopConnectTimeout();
+  stopLobbyHeartbeat();
 
   if (conn) {
     conn.close();
     conn = null;
   }
 
-  if (peer) {
+  if (destroyPeer && peer) {
     peer.destroy();
     peer = null;
   }
 
   matchmakingPeersSeen.clear();
-  callbacks.onStatusUpdate("Solo mode active.");
+
+  if (status) callbacks.onStatusUpdate(status);
 }
 
+// Core clean up routine
+export function cancelMultiplayer() {
+  teardown({ destroyPeer: true, status: "Solo mode active." });
+}
+
+// Drops the current session without killing the peer (used before reconnects)
 export function disconnectOpponent() {
-  isMatchmaking = false;
-  role = null;
-  roomCode = null;
-
-  stopP2PHeartbeat();
-  if (connectionTimeout) {
-    clearTimeout(connectionTimeout);
-    connectionTimeout = null;
-  }
-
-  if (heartbeatInterval) {
-    clearInterval(heartbeatInterval);
-    heartbeatInterval = null;
-  }
-
-  if (conn) {
-    conn.close();
-    conn = null;
-  }
-
-  matchmakingPeersSeen.clear();
+  teardown();
 }
 
 export async function preConnectPeer() {
@@ -217,7 +214,7 @@ export async function hostGame() {
     await postToBasket(basketId, myId);
     heartbeatInterval = setInterval(async () => {
       await postToBasket(basketId, myId);
-    }, 12000);
+    }, LOBBY_POLL_INTERVAL_MS);
   } catch (err) {
     console.error("Failed to host game:", err);
     callbacks.onStatusUpdate("Lobby creation failed.");
@@ -263,11 +260,11 @@ export async function startQuickMatch() {
     const myId = await ensurePeerInitialized();
     await performMatchmakingTick(myId);
 
-    // Poll public matchmaking room every 12 seconds to find seekers or refresh heartbeat
+    // Poll public matchmaking room to find seekers or refresh heartbeat
     heartbeatInterval = setInterval(async () => {
       if (!isMatchmaking) return;
       await performMatchmakingTick(myId);
-    }, 12000);
+    }, LOBBY_POLL_INTERVAL_MS);
   } catch (err) {
     console.error("Matchmaking error:", err);
     callbacks.onStatusUpdate("Matchmaking failed.");
@@ -300,13 +297,31 @@ async function performMatchmakingTick(myId) {
   }
 }
 
-// ----------------- DIRECT P2P DIRECT CONNECTION -----------------
+// ----------------- DIRECT P2P CONNECTION -----------------
+// Shared handler wiring: outbound connects and inbound accepts use the same
+// open/data/close/error behavior, differing only in what happens on open.
+function wireConnection(c, onOpen) {
+  c.on("open", onOpen);
+  c.on("data", (data) => handleData(data));
+  c.on("close", () => {
+    console.log("Connection closed");
+    stopP2PHeartbeat();
+    callbacks.onOpponentDisconnect();
+  });
+  c.on("error", (err) => console.error("Connection error:", err));
+}
+
+function onConnectionOpened() {
+  stopConnectTimeout();
+  startP2PHeartbeat();
+  stopLobbyHeartbeat();
+  callbacks.onStatusUpdate("Connected. Starting soon...");
+  callbacks.onConnectionEstablished();
+}
+
 function connectToPeer(targetId, matchmakingMode = false) {
   if (conn) conn.close();
-  if (connectionTimeout) {
-    clearTimeout(connectionTimeout);
-    connectionTimeout = null;
-  }
+  stopConnectTimeout();
 
   conn = peer.connect(targetId, { reliable: true });
 
@@ -322,41 +337,20 @@ function connectToPeer(targetId, matchmakingMode = false) {
         cancelMultiplayer();
       }
     }
-  }, 10000); // 10 second timeout
+  }, CONNECT_TIMEOUT_MS);
 
-  conn.on("open", () => {
-    if (connectionTimeout) {
-      clearTimeout(connectionTimeout);
-      connectionTimeout = null;
-    }
+  wireConnection(conn, () => {
     console.log("Data connection opened with:", targetId);
-    startP2PHeartbeat();
     if (matchmakingMode) {
+      // Matchmaking opener proposes the match; acceptance switches to playing
+      stopConnectTimeout();
+      startP2PHeartbeat();
       callbacks.onStatusUpdate("Negotiating match...");
       conn.send({ type: "match_request", senderId: peer.id });
     } else {
       // In private joining, connection open means connected
-      callbacks.onStatusUpdate("Connected. Starting soon...");
-      if (heartbeatInterval) {
-        clearInterval(heartbeatInterval);
-        heartbeatInterval = null;
-      }
-      callbacks.onConnectionEstablished();
+      onConnectionOpened();
     }
-  });
-
-  conn.on("data", (data) => {
-    handleData(data);
-  });
-
-  conn.on("close", () => {
-    console.log("Connection closed");
-    stopP2PHeartbeat();
-    callbacks.onOpponentDisconnect();
-  });
-
-  conn.on("error", (err) => {
-    console.error("Connection error:", err);
   });
 }
 
@@ -370,31 +364,15 @@ function handleIncomingConnection(incomingConn) {
   if (conn) conn.close();
   conn = incomingConn;
 
-  conn.on("open", () => {
+  wireConnection(conn, () => {
     console.log("Incoming connection opened from:", conn.peer);
-    startP2PHeartbeat();
-    if (!isMatchmaking) {
-      callbacks.onStatusUpdate("Connected. Starting soon...");
-      if (heartbeatInterval) {
-        clearInterval(heartbeatInterval);
-        heartbeatInterval = null;
-      }
-      callbacks.onConnectionEstablished();
+    if (isMatchmaking) {
+      // Matchmaking acceptor waits for the match_request proposal
+      startP2PHeartbeat();
+    } else {
+      // Private lobby guest walked in
+      onConnectionOpened();
     }
-  });
-
-  conn.on("data", (data) => {
-    handleData(data);
-  });
-
-  conn.on("close", () => {
-    console.log("Incoming connection closed");
-    stopP2PHeartbeat();
-    callbacks.onOpponentDisconnect();
-  });
-
-  conn.on("error", (err) => {
-    console.error("Incoming connection error:", err);
   });
 }
 
@@ -412,10 +390,7 @@ function handleData(data) {
         roomCode =
           "MATCH-" + Math.random().toString(36).substring(2, 6).toUpperCase();
 
-        if (heartbeatInterval) {
-          clearInterval(heartbeatInterval);
-          heartbeatInterval = null;
-        }
+        stopLobbyHeartbeat();
 
         conn.send({ type: "match_accept", roomCode });
         callbacks.onStatusUpdate("Opponent ready. Starting...");
@@ -430,10 +405,7 @@ function handleData(data) {
         role = "guest";
         roomCode = data.roomCode;
 
-        if (heartbeatInterval) {
-          clearInterval(heartbeatInterval);
-          heartbeatInterval = null;
-        }
+        stopLobbyHeartbeat();
 
         callbacks.onStatusUpdate("Connected. Waiting for host...");
         callbacks.onConnectionEstablished();
