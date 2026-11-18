@@ -39,6 +39,17 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
+// Canvas has no color-mix(): painting a token at partial alpha over the paper
+// gives the same pastel tint, keeping ink text readable on top.
+function tinted(ctx, rect, color, alpha) {
+  const [x, y, w, h] = rect;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, w, h);
+  ctx.restore();
+}
+
 function label(ctx, text, x, y, { size = 13, color, align = "left" } = {}) {
   ctx.save();
   ctx.fillStyle = color;
@@ -76,6 +87,10 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
   const paper = themeColor("base-100", "#f3e7cc");
   const panel = themeColor("base-200", "#e8dfc7");
   const accent = themeColor("warning", "#e07b39");
+  const mint = themeColor("secondary", "#bbf7d0");
+  const sky = themeColor("info", "#38bdf8");
+  const orange = themeColor("accent", "#f59e0b");
+  const coral = themeColor("error", "#ef4444");
 
   const canvas = document.createElement("canvas");
   canvas.width = W;
@@ -113,6 +128,11 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.lineWidth = 10;
     ctx.strokeRect(20, 20, W - 40, H - 40);
 
+    // ── Header band: mint block, ink rule underneath ─────────────────────
+    tinted(ctx, [24, 24, W - 48, 136], mint, 0.85);
+    ctx.fillStyle = ink;
+    ctx.fillRect(24, 154, W - 48, 6);
+
     // ── Header: wordmark + tile motif ────────────────────────────────────
     ctx.fillStyle = ink;
     ctx.textAlign = "left";
@@ -130,7 +150,9 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
       ctx.lineWidth = 3;
       ctx.strokeRect(stripX + i * tileSize, tileY, tileSize, tileSize);
     }
-    ctx.fillStyle = accent;
+    ctx.fillStyle = orange;
+    ctx.fillRect(stripX + 3 * tileSize + 6, tileY + 6, tileSize - 12, tileSize - 12);
+    ctx.fillStyle = sky;
     ctx.fillRect(stripX + 4 * tileSize + 6, tileY + 6, tileSize - 12, tileSize - 12);
 
     label(ctx, "UNSCRAMBLE THE PHOTO · REVEAL THE PLACE", MARGIN, 143, {
@@ -143,6 +165,14 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     const imgY = 172;
     const imgW = W - MARGIN * 2;
     const imgH = 432;
+
+    // sky plate behind the photo (flat colour, no shadow)
+    roundRect(ctx, imgX - 14, imgY - 14, imgW + 28, imgH + 28, 20);
+    ctx.save();
+    ctx.globalAlpha = 0.32;
+    ctx.fillStyle = sky;
+    ctx.fill();
+    ctx.restore();
 
     ctx.save();
     roundRect(ctx, imgX, imgY, imgW, imgH, 14);
@@ -173,7 +203,21 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.stroke();
 
     // ── Location ─────────────────────────────────────────────────────────
-    label(ctx, "LOCATION", MARGIN, 660, { size: 13, color: ink });
+    // mint location chip
+    roundRect(ctx, MARGIN, 636, 132, 30, 8);
+    ctx.save();
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = mint;
+    ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    label(ctx, "LOCATION", MARGIN + 66, 657, {
+      size: 12,
+      color: ink,
+      align: "center",
+    });
     const nameSize = fittedSize(ctx, locationName, imgW, 44);
     ctx.fillStyle = ink;
     ctx.font = `900 ${nameSize}px Fredoka, sans-serif`;
@@ -183,19 +227,29 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     // ── Stat strip: one flat panel, two inner dividers ───────────────────
     const stripY = 748;
     const stripH = 116;
+    const cellW = imgW / 3;
+
+    const cells = [
+      { label: "TIME", value: timeText, color: mint },
+      { label: "MOVES", value: String(movesText), color: sky },
+      { label: "GLOBAL RANK", value: rankVal, color: orange },
+    ];
+
+    // one rounded strip, three coloured cells, ink dividers on top
+    ctx.save();
     roundRect(ctx, imgX, stripY, imgW, stripH, 14);
-    ctx.fillStyle = panel;
-    ctx.fill();
+    ctx.clip();
+    cells.forEach((cell, i) => {
+      // sky is the most saturated token, so it gets the lightest wash
+      const wash = cell.color === sky ? 0.32 : 0.45;
+      tinted(ctx, [imgX + cellW * i, stripY, cellW, stripH], cell.color, wash);
+    });
+    ctx.restore();
+
+    roundRect(ctx, imgX, stripY, imgW, stripH, 14);
     ctx.strokeStyle = ink;
     ctx.lineWidth = 5;
     ctx.stroke();
-
-    const cells = [
-      { label: "TIME", value: timeText, color: ink },
-      { label: "MOVES", value: String(movesText), color: ink },
-      { label: "GLOBAL RANK", value: rankVal, color: accent },
-    ];
-    const cellW = imgW / 3;
 
     cells.forEach((cell, i) => {
       const cx = imgX + cellW * i + cellW / 2;
@@ -204,8 +258,8 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
         ctx.strokeStyle = ink;
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.moveTo(imgX + cellW * i, stripY + 8);
-        ctx.lineTo(imgX + cellW * i, stripY + stripH - 8);
+        ctx.moveTo(imgX + cellW * i, stripY + 6);
+        ctx.lineTo(imgX + cellW * i, stripY + stripH - 6);
         ctx.stroke();
       }
 
@@ -215,7 +269,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
         align: "center",
       });
 
-      ctx.fillStyle = cell.color;
+      ctx.fillStyle = ink;
       ctx.font = '900 44px Fredoka, sans-serif';
       ctx.textAlign = "center";
       ctx.textBaseline = "alphabetic";
@@ -238,7 +292,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.save();
     ctx.translate(W - MARGIN - 54, 918);
     ctx.rotate(-0.16);
-    ctx.strokeStyle = ink;
+    ctx.strokeStyle = coral;
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(0, 0, 46, 0, Math.PI * 2);
@@ -246,7 +300,7 @@ export function generateScorecard(currentMap, timeText, movesText, rankText) {
     ctx.beginPath();
     ctx.arc(0, 0, 38, 0, Math.PI * 2);
     ctx.stroke();
-    ctx.fillStyle = ink;
+    ctx.fillStyle = coral;
     ctx.textAlign = "center";
     ctx.font = '700 10px "Space Mono", monospace';
     if ("letterSpacing" in ctx) ctx.letterSpacing = "1px";

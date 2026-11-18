@@ -55,13 +55,13 @@ export function buildSharePayload(currentMap, timeText, movesText, rankText) {
   const mapLink = currentMap.map || "#";
 
   const hasRank = rankText && String(rankText).replace("#", "").match(/\d/);
-  const rankPhrase = hasRank ? `Global rank ${rankText}. ` : "";
+  const rankSentence = hasRank ? ` Global rank ${rankText}.` : "";
 
-  // Primary line: playful, geography-forward, never says "satellite".
-  const shareText = `${locationName} unscrambled in ${timeText} and ${movesText} moves. ${rankPhrase}A cartographer somewhere just sighed. Think you can beat me?\n\nPlay here: ${shareUrl}`;
+  // Primary line: the original concrete sentence, just less stiff.
+  const shareText = `I solved ${locationName} in ${timeText} with ${movesText} moves!${rankSentence} Can you beat me?\n\nPlay here: ${shareUrl}`;
 
   // Short variant for character-limited networks.
-  const shareTextShort = `${locationName} in ${timeText}, ${movesText} moves${hasRank ? `, rank ${rankText}` : ""}. The equator called. It has no comment. Beat me: ${shareUrl}`;
+  const shareTextShort = `I solved ${locationName} in ${timeText} with ${movesText} moves!${rankSentence} Can you beat me? ${shareUrl}`;
 
   const shareTextWithImg = `${shareText}\n\nLocation: ${mapLink}`;
 
@@ -92,7 +92,7 @@ export function setupSocialShareLinks(
     hasRank,
   } = buildSharePayload(currentMap, timeText, movesText, rankText);
 
-  const redditTitle = `I unscrambled ${locationName} in ${timeText} (${movesText} moves). Can you beat my GeoShuffle run?`;
+  const redditTitle = `I solved ${locationName} in ${timeText} with ${movesText} moves (GeoShuffle)`;
 
   const shareTwitter = document.getElementById("share-twitter");
   if (shareTwitter) {
@@ -101,7 +101,7 @@ export function setupSocialShareLinks(
 
   const shareReddit = document.getElementById("share-reddit");
   if (shareReddit) {
-    const redditBody = `${hasRank ? `Global rank ${rankText}. ` : ""}GeoShuffle is a sliding puzzle where you rebuild a photo to reveal where it was taken. Fair warning: the geography nerds are already on it.\n\nPlay here: ${shareUrl}`;
+    const redditBody = `GeoShuffle is a sliding puzzle: you rebuild a photo of a place, then find out where it was. This one was **${locationName}**.\n\n**Time:** ${timeText}\n**Moves:** ${movesText}${hasRank ? `\n**Global rank:** ${rankText}` : ""}\n\nPlay here: ${shareUrl}`;
     shareReddit.href = `https://www.reddit.com/submit?title=${encodeURIComponent(redditTitle)}&text=${encodeURIComponent(redditBody)}`;
   }
 
@@ -153,7 +153,7 @@ export async function triggerNativeShare(
   if (navigator.share) {
     try {
       let shareData = {
-        title: "GeoShuffle — unscramble the photo, reveal the place",
+        title: "GeoShuffle",
         text: shareText,
         url: shareUrl,
       };
