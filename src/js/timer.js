@@ -1,9 +1,9 @@
 import { gsap } from "gsap";
 import iconsUrl from "../assets/icons.svg?url";
 
-// TESTING: hint cooldown shortened from 45s so the reveal path can be tested
-// without waiting. Restore to 45 before release.
-export const HINT_DELAY_SECONDS = 5;
+// TESTING HOOK: drop this to ~5s to exercise the reveal path without waiting.
+// 45s is the production cooldown.
+export const HINT_DELAY_SECONDS = 45;
 
 let timerInterval = null;
 let timeElapsed = 0;

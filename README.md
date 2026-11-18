@@ -68,12 +68,14 @@ npm install
 npm run dev
 ```
 
-While developing, `src/js/game.js` exposes two shortcuts you may want to tweak:
-- `TESTING_MODE` — skips global leaderboard submissions (keeps test runs off the shared board).
-- `SHUFFLE_STEPS` / shuffle animation timings — lowered so a solvable board is a few moves away.
+While developing, `src/js/game.js` exposes two shortcuts you may want to tweak
+(both are at production values by default — flip them on for local testing):
+- `TESTING_MODE` — set to `true` to skip global leaderboard submissions (keeps test runs off the shared board).
+- `SHUFFLE_STEPS` / `SHUFFLE_DELAY` / `SHUFFLE_DURATION` — drop to `5` / `0.15` / `0.45` so a solvable board is a few moves away.
 
-Set `TESTING_MODE` to `false` and restore `SHUFFLE_STEPS` to `200` before shipping. The hint
-cooldown lives in `src/js/timer.js` as `HINT_DELAY_SECONDS` (45s in production).
+The hint cooldown lives in `src/js/timer.js` as `HINT_DELAY_SECONDS` — `45` in
+production, lowered to ~`5` while testing the reveal path. Remember to put all
+of these back before shipping.
 
 ### Supabase (Global Leaderboard)
 

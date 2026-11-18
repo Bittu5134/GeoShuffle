@@ -8,13 +8,13 @@ gsap.registerPlugin(Flip);
 export const COLS = 6;
 export const ROWS = 4;
 
-// TESTING: keep the scramble tiny and the shuffle animation snappy so a solve
-// can be reached in a few clicks. Restore to 200 / 0.5s / 1s before release,
-// and set TESTING_MODE back to false so scores post to the global board again.
-export const TESTING_MODE = true;
-export const SHUFFLE_STEPS = 5;
-const SHUFFLE_DELAY = 0.15;
-const SHUFFLE_DURATION = 0.45;
+// TESTING HOOKS: flip TESTING_MODE to true, drop SHUFFLE_STEPS to ~5 and
+// shorten the delays to reach a solve in a few clicks. Keep the values below
+// at production settings when shipping.
+export const TESTING_MODE = false;
+export const SHUFFLE_STEPS = 200;
+const SHUFFLE_DELAY = 0.5;
+const SHUFFLE_DURATION = 1;
 
 let tiles = [...Array(24).keys()].map((i) => i + 1);
 const tilesEnd = [...tiles];
